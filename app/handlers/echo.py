@@ -12,6 +12,7 @@ async def send_welcome(message: types.Message):
     """
     logger.info(
         f'<send_welcome> sent a message to a {message.from_user.id}')
+    print(message.as_json())
     await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
 
 
