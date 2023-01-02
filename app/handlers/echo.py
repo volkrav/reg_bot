@@ -2,6 +2,8 @@ import logging
 from aiogram import Dispatcher, types
 from aiogram.dispatcher.filters import CommandStart, Text
 
+from app.keyboards import reply
+
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +14,9 @@ async def send_welcome(message: types.Message):
     """
     logger.info(
         f'<send_welcome> sent a message to a {message.from_user.id}')
-    print(message.as_json())
-    await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
+    await message.reply(
+        "Hi!\nI'm EchoBot!\nPowered by aiogram.",
+        reply_markup=reply.kb_start)
 
 
 async def echo(message: types.Message):
