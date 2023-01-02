@@ -6,6 +6,8 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import NetworkError
 
 from app.config import load_config
+from app.handlers.start import register_start
+from app.handlers.help import register_help
 from app.handlers.echo import register_echo
 
 
@@ -28,6 +30,8 @@ def register_all_filters(dp: Dispatcher):
 
 
 def register_all_handlers(dp: Dispatcher):
+    register_start(dp)
+    register_help(dp)
     register_echo(dp)
 
 
@@ -37,7 +41,7 @@ async def main():
         level=logging.INFO,
         datefmt='%d-%m-%y %H:%M',
         format=u'%(asctime)s #%(levelname)-8s %(name)s:%(lineno)d - %(message)s',
-        filename='reg_bot.log'
+        # filename='reg_bot.log'
     )
 
     config = load_config()
