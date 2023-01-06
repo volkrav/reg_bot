@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import CommandStart, Text
 
 from app.keyboards import reply
+from app.misc.classes import Start
 
 
 logger = logging.getLogger(__name__)
@@ -18,8 +19,11 @@ async def command_start(message: types.Message, state: FSMContext):
             f'<command_start> OK {message.from_user.id} started work')
         answer = (
             f'- Привітальна інформація\n'
+            f'- Короткий опис, як працює чекер.\n'
         )
-    answer += f'- Короткий опис, як працює чекер.'
+        await message.answer(answer)
+    answer = 'Будь ласка, оберіть потрібний розділ ⤵️'
+    await Start.free.set()
     await message.answer(
         text=answer,
         reply_markup=reply.kb_start

@@ -8,6 +8,9 @@ from aiogram.utils.exceptions import NetworkError
 from app.config import load_config
 from app.handlers.start import register_start
 from app.handlers.help import register_help
+from app.handlers.registration import register_reg
+
+from app.handlers.back import register_back
 from app.handlers.echo import register_echo
 
 
@@ -32,6 +35,8 @@ def register_all_filters(dp: Dispatcher):
 def register_all_handlers(dp: Dispatcher):
     register_start(dp)
     register_help(dp)
+    register_reg(dp)
+    register_back(dp)
     register_echo(dp)
 
 
@@ -62,7 +67,6 @@ async def main():
     try:
         await dp.skip_updates()
         await dp.start_polling(bot)
-        logger.info('Start bot')
     finally:
         await dp.storage.close()
         await dp.storage.wait_closed()
