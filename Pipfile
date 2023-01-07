@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 aiogram = "*"
 python-dotenv = "*"
+asyncpg = "*"
 
 [dev-packages]
 autopep8 = "*"

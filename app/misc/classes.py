@@ -10,3 +10,27 @@ class CheckIn(StatesGroup):
     ip = State()
     disturb = State()
     canceled = State()
+
+class DeviceList(StatesGroup):
+    show_device_list = State()
+
+class Device(NamedTuple):
+    id: int | None
+    name: str
+    ip: str
+    status: str
+    do_not_disturb: bool
+    notify: bool
+    user_id: int
+
+
+async def create_device(data: dict) -> Device:
+    return Device(
+        id = data.get('id', None),
+        name = data.get('name'),
+        ip = data.get('ip'),
+        status = data.get('status', ''),
+        do_not_disturb = data.get('do_not_disturb'),
+        notify = data.get('notify', True),
+        user_id = data.get('user_id')
+    )

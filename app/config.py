@@ -9,8 +9,16 @@ class TgBot:
     token: str
 
 @dataclass
+class DbConfig:
+    host: str
+    database: str
+    user: str
+    password: str
+
+@dataclass
 class Config:
     tg_bot: TgBot
+    # db: DbConfig
 
 def load_config() -> Config:
     return Config(
@@ -18,3 +26,10 @@ def load_config() -> Config:
             token=os.environ.get('BOT_TOKEN')
         )
     )
+async def load_db_config() -> DbConfig:
+    return DbConfig(
+            host=os.environ.get('DB_HOST'),
+            database=os.environ.get('DB_NAME'),
+            user=os.environ.get('DB_USER'),
+            password=os.environ.get('DB_PASS'),
+        )

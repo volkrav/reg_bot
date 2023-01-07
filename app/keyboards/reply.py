@@ -54,10 +54,18 @@ kb_yes_or_no = ReplyKeyboardMarkup(
 
 '''************************ Скасувати ************************'''
 
-
 kb_cancel = ReplyKeyboardMarkup(
     keyboard=[
         [btn_cancel]
+    ],
+    resize_keyboard=True
+)
+
+'''************************ Yfpfl ************************'''
+
+kb_back = ReplyKeyboardMarkup(
+    keyboard=[
+        [btn_back]
     ],
     resize_keyboard=True
 )
