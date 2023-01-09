@@ -7,6 +7,7 @@ from aiogram.dispatcher.filters import Text
 from app.keyboards import reply, inline
 from app.data.db_api import get_all_users_devices, db_delete_device, db_get_device
 from app.misc.classes import DeviceList
+from app.misc.utils import get_now_formatted
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,8 @@ async def command_my_devices(message: types.Message, state: FSMContext):
             f'IP: {device.ip}\n'
             f'Статус: {device.status}\n'
             f'Не турбувати вночі: {("🔴", "🟢")[device.do_not_disturb]}\n'
-            f'Сповіщати: {("🔴", "🟢")[device.notify]}'
+            f'Сповіщати: {("🔴", "🟢")[device.notify]}\n'
+            f'Остання зміна: {get_now_formatted(device.change_date)}'
         )
         await message.answer(answer,
                              reply_markup=await inline.device_keyboard(device_id=device.id))
@@ -41,7 +43,7 @@ async def delete_device(message: types.Message, device_id: int, state: FSMContex
                 f'<delete_device> OK {user_id} deleted {device.name}'
             )
             answer = (
-                f'{device.name} був вдало видалений.'
+                f'Пристрій {device.name} був вдало видалений.'
             )
         else:
             logger.warning(

@@ -2,6 +2,8 @@ from typing import NamedTuple
 
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
+from app.misc.utils import get_now_formatted, datetime, get_now_datetime
+
 class Start(StatesGroup):
     free = State()
 
@@ -18,6 +20,8 @@ class CheckIn(StatesGroup):
 
 class DeviceList(StatesGroup):
     show_device_list = State()
+    del_device = State()
+    change_device = State()
 
 class Device(NamedTuple):
     id: int | None
@@ -26,6 +30,7 @@ class Device(NamedTuple):
     status: str
     do_not_disturb: bool
     notify: bool
+    change_date: datetime.datetime | str
     user_id: int
 
 
@@ -37,5 +42,6 @@ async def create_device(data: dict) -> Device:
         status = data.get('status', ''),
         do_not_disturb = data.get('do_not_disturb'),
         notify = data.get('notify', True),
+        change_date = data.get('change_date', get_now_datetime()),
         user_id = data.get('user_id')
     )

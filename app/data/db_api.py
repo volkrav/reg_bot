@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple, Union
 
 from app.data.DBcm import UseDataBase
 from app.misc.classes import Device, create_device
+from app.misc.utils import get_now_datetime, get_now_formatted
 
 
 logger = logging.getLogger(__name__)
@@ -22,7 +23,7 @@ async def db_add_device(device: Device):
         await _insert('users',
                       {
                           'user_id': device.user_id,
-                          'reg_date': datetime.datetime.now()
+                          'reg_date': get_now_datetime()
                       })
     await _insert('devices',
                   {
@@ -31,6 +32,7 @@ async def db_add_device(device: Device):
                       'status': device.status,
                       'do_not_disturb': device.do_not_disturb,
                       'notify': device.notify,
+                      'change_date': device.change_date,
                       'user_id': device.user_id
                   })
 

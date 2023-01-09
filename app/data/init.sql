@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" serial NOT NULL,
 	"user_id" bigint NOT NULL UNIQUE,
-	"reg_date" TIMESTAMP NOT NULL,
+	"reg_date" timestamptz NOT NULL,
 	CONSTRAINT "users_pk" PRIMARY KEY ("id")
 ) WITH (
   OIDS=FALSE
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "devices" (
     "status" varchar(10),
 	"do_not_disturb" BOOLEAN NOT NULL,
 	"notify" BOOLEAN NOT NULL DEFAULT TRUE,
+	"change_date" timestamptz NOT NULL,
 	"user_id" bigint NOT NULL,
 	CONSTRAINT "devices_pk" PRIMARY KEY ("id"),
     CONSTRAINT "devices_fk0"
