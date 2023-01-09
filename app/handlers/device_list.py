@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.keyboards import reply, inline
-from app.data.db_api import get_all_users_devices, db_delete_device
+from app.data.db_api import get_all_users_devices, db_delete_device, db_get_device
 from app.misc.classes import DeviceList
 
 
@@ -31,16 +31,28 @@ async def command_my_devices(message: types.Message, state: FSMContext):
                              reply_markup=await inline.device_keyboard(device_id=device.id))
 
 
+
 async def delete_device(message: types.Message, device_id: int, state: FSMContext):
+    user_id = (message.from_user.id, message.chat.id)[message.from_user.is_bot]
     try:
-        await db_delete_device(device_id)
-        logger.info(
-            f'<delete_device> OK {message.from_user.id} deleted {device_id}'
-        )
+        if device := await db_get_device(int(device_id)):
+            # await db_delete_device(device_id)
+            logger.info(
+                f'<delete_device> OK {user_id} deleted {device.name}'
+            )
+            answer = (
+                f'{device.name} був вдало видалений.'
+            )
+        else:
+            logger.warning(
+                f'<delete_device> OK {user_id} tried to delete {device_id}'
+            )
+            answer = 'Цей пристрій був видалений раніше'
     except Exception as err:
         logger.error(
-            f'<delete_device> {message.from_user.id} get {err.args}'
+            f'<delete_device> {user_id} get {err.args}'
         )
+    await message.answer(answer)
     await command_my_devices(message, state)
 
 

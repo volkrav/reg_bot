@@ -37,13 +37,27 @@ async def db_add_device(device: Device):
 
 async def get_all_users_devices(user_id: int) -> List[Device]:
     async with UseDataBase() as conn:
-        res = await conn.fetch(
+        device_rows = await conn.fetch(
             f'SELECT * FROM devices '
             f'WHERE user_id=$1',
             user_id
         )
-    out = [await create_device(dev) for dev in res]
-    return out
+    devices_list = [await create_device(device) for device in device_rows]
+    return devices_list
+
+async def db_get_device(device_id: int) -> Device:
+    try:
+        async with UseDataBase() as conn:
+            device_row = await conn.fetchrow(
+                f'SELECT * FROM devices '
+                f'WHERE id=$1',
+                device_id
+            )
+            device = await create_device(device_row)
+            return device
+    except:
+        return None
+
 
 async def db_delete_device(device_id: int) -> None:
     try:
@@ -90,6 +104,16 @@ async def _check_is_user(user_id: int) -> bool:
             f'SELECT * FROM users '
             f'WHERE user_id=$1',
             user_id,
+            record_class=None
+        )
+    return res != None
+
+async def db_check_is_device(device_id: int) -> bool:
+    async with UseDataBase() as conn:
+        res = await conn.fetchrow(
+            f'SELECT * FROM devices '
+            f'WHERE id=$1',
+            device_id,
             record_class=None
         )
     return res != None

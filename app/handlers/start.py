@@ -30,23 +30,10 @@ async def command_start(message: types.Message, state: FSMContext):
     )
 
 
-async def command_help(message: types.Message, state: FSMContext):
-    logger.info(
-        f'<command_help> OK {message.from_user.id} open help'
-    )
-    answer = (
-        f'Будь ласка, оберіть потрібний розділ ⤵️'
-    )
-    await message.answer(
-        text=answer,
-        reply_markup=reply.kb_help
-    )
+
 
 
 def register_start(dp: Dispatcher):
     dp.register_message_handler(command_start,
                                 CommandStart(),
-                                state='*')
-    dp.register_message_handler(command_help,
-                                Text(equals='Допомога', ignore_case=True),
                                 state='*')

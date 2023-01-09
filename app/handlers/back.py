@@ -19,13 +19,20 @@ async def command_back(message: types.Message, state: FSMContext):
 
 
 async def _get_current_function(current_state: FSMContext):
-    functions = {
-        None: command_start,
-        'Start:free': command_start,
-        'CheckIn:canceled': command_start,  # TODO!
-        'DeviceList:show_device_list': command_start,
-    }
-    return functions.get(current_state, command_start)
+    # functions = {
+    #     None: command_start,
+    #     'Start:free': command_start,
+    #     'CheckIn:canceled': command_start,  # TODO!
+    #     'DeviceList:show_device_list': command_start,
+    # }
+    # return functions.get(current_state, command_start)
+    match (current_state, None):
+        case state, _ if (not state) \
+                or state.split(':')[0] in ('Start',
+                                           'CheckIn',
+                                           'DeviceList',
+                                           'NeedHelp'):
+            return command_start
 
 
 def register_back(dp: Dispatcher):
