@@ -16,6 +16,8 @@ async def echo(message: types.Message, state: FSMContext):
             markup = reply.kb_start
         case curr_state, _ if curr_state.split(':')[0] in ('NeedHelp',):
             markup = reply.kb_help
+        case "DeviceList:change_device", _:
+            markup = reply.kb_change
         case curr_state, _ if curr_state.split(':')[0] in ('DeviceList',):
             markup = reply.kb_back
         # case _:DeviceList

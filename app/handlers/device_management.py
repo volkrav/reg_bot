@@ -4,7 +4,7 @@ from aiogram.dispatcher import FSMContext
 
 from aiogram.dispatcher.filters import Text
 
-from app.handlers.device_list import command_my_device_li_listt
+from app.handlers.device_list import command_my_device_list
 from app.keyboards import reply, inline
 from app.data.db_api import get_all_users_devices, db_delete_device, db_get_device
 from app.misc.classes import DeviceList, get_device_view, Device
@@ -46,8 +46,12 @@ async def change_device(message: types.Message, state: FSMContext, device: Devic
         )
         await message.answer('Цей пристрій був видалений раніше')
         return await command_my_device_list(message, state)
-    answer = '✏️ Пристрій:\n' + await get_device_view(device)
-    await message.answer(answer + '\n\n' + 'Що будемо змінювати? ⤵️')
+    await DeviceList.change_device.set()
+    answer = '✏️ Пристрій:\n\n' + await get_device_view(device)
+    await message.answer(
+        text=answer + '\n\n' + 'Що будемо змінювати? ⤵️',
+        reply_markup=reply.kb_change
+        )
     ...
 
 

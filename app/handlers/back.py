@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.handlers.start import command_start
+from app.handlers.device_list import command_my_device_list
 
 
 logger = logging.getLogger(__name__)
@@ -27,6 +28,8 @@ async def _get_current_function(current_state: FSMContext):
     # }
     # return functions.get(current_state, command_start)
     match (current_state, None):
+        case 'DeviceList:change_device', _:
+            return command_my_device_list
         case state, _ if (not state) \
                 or state.split(':')[0] in ('Start',
                                            'CheckIn',
