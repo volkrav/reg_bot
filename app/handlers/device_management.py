@@ -4,18 +4,18 @@ from aiogram.dispatcher import FSMContext
 
 from aiogram.dispatcher.filters import Text
 
-from app.handlers.device_list import command_my_devices
+from app.handlers.device_list import command_my_device_list
 from app.keyboards import reply, inline
 from app.data.db_api import get_all_users_devices, db_delete_device, db_get_device
 from app.misc.classes import DeviceList, get_device_view, Device
-from app.misc.utils import get_now_formatted
+from app.misc.utils import get_now_formatted, get_user_id
 
 
 logger = logging.getLogger(__name__)
 
 
 async def delete_device(message: types.Message, state: FSMContext, device: Device):
-    user_id = message.chat.id if message.from_user.is_bot else message.from_user.id
+    user_id = await get_user_id(message)
     try:
         if device:
             await db_delete_device(device.id)
@@ -27,7 +27,7 @@ async def delete_device(message: types.Message, state: FSMContext, device: Devic
             )
         else:
             logger.warning(
-                f'<delete_device> OK {user_id} tried to deleted device'
+                f'<delete_device> OK {user_id} tried to delete a deleted device'
             )
             answer = 'Цей пристрій був видалений раніше'
     except Exception as err:
@@ -35,10 +35,19 @@ async def delete_device(message: types.Message, state: FSMContext, device: Devic
             f'<delete_device> {user_id} get {err.args}'
         )
     await message.answer(answer)
-    await command_my_devices(message, state)
+    await command_my_device_list(message, state)
 
 
-async def change_device():
+async def change_device(message: types.Message, state: FSMContext, device: Device):
+    user_id = await get_user_id(message)
+    if not device:
+        logger.warning(
+            f'<change_device> OK {user_id} tried to change a deleted device'
+        )
+        await message.answer('Цей пристрій був видалений раніше')
+        return await command_my_device_list(message, state)
+    answer = '✏️ Пристрій:\n' + await get_device_view(device)
+    await message.answer(answer + '\n\n' + 'Що будемо змінювати? ⤵️')
     ...
 
 async def navigate(call: types.CallbackQuery, state: FSMContext, callback_data: dict):

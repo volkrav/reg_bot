@@ -71,7 +71,7 @@ async def is_disturb(message: types.Message, state: FSMContext):
         await db_add_device(device)
         # do_not_disturb = ('🔴', '🟢')[device.do_not_disturb]
         answer = (
-            f'✅ Додав до моніторингу наступний пристрій:\n'
+            f'✅ Додав до моніторингу новий пристрій:\n'
             f'- <b>Назва:</b> {device.name}\n'
             f'- <b>IP:</b> {device.ip}\n'
             f'- <b>Не турбувати вночі:</b> {("🔴", "🟢")[device.do_not_disturb]}\n'

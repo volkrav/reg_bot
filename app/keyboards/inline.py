@@ -11,11 +11,11 @@ async def device_keyboard(device_id) -> InlineKeyboardMarkup:
 
     markup = InlineKeyboardMarkup()
     button_change_text = InlineKeyboardButton(
-        text='Змінити',
+        text='✏️ Змінити',
         callback_data=make_callbackdata('change', device_id)
     )
     button_del_text = InlineKeyboardButton(
-        text='Видалити',
+        text='❌ Видалити',
         callback_data=make_callbackdata('del', device_id)
     )
 
