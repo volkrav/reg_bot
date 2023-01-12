@@ -38,6 +38,25 @@ kb_help = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+'''************************ Змінити пристрій ************************'''
+kb_change = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text='Назву'),
+            KeyboardButton(text='IP'),
+        ],
+        [
+            KeyboardButton(text='Не турбувати'),
+            KeyboardButton(text='Сповіщати'),
+        ],
+        [
+            btn_cancel,
+        ],
+    ],
+        resize_keyboard=True
+)
+
+
 '''************************ Так Ні ************************'''
 
 kb_yes_or_no = ReplyKeyboardMarkup(
@@ -61,7 +80,7 @@ kb_cancel = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
-'''************************ Yfpfl ************************'''
+'''************************ Назад ************************'''
 
 kb_back = ReplyKeyboardMarkup(
     keyboard=[
