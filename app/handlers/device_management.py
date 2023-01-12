@@ -12,21 +12,6 @@ from app.misc.utils import get_now_formatted
 
 logger = logging.getLogger(__name__)
 
-async def command_my_devices(message: types.Message, state: FSMContext):
-    await DeviceList.show_device_list.set()
-    await message.answer(
-        text='Список пристроїв:',
-        reply_markup=reply.kb_back)
-
-    user_id = (message.from_user.id, message.chat.id)[message.from_user.is_bot]
-
-    for i, device in enumerate(await get_all_users_devices(user_id)):
-        answer = f'<b>{i+1}.</b> {await get_device_view(device)}'
-        await message.answer(answer,
-                             reply_markup=await inline.device_keyboard(device_id=device.id))
-
-
-
 async def delete_device(message: types.Message, device_id: int, state: FSMContext):
     user_id = (message.from_user.id, message.chat.id)[message.from_user.is_bot]
     try:
@@ -63,10 +48,6 @@ async def navigate(call: types.CallbackQuery, state: FSMContext, callback_data: 
 
 
 def register_device_list(dp: Dispatcher):
-    dp.register_message_handler(command_my_devices,
-                                Text(equals='Мої пристрої',
-                                     ignore_case=True),
-                                state='*')
     dp.register_callback_query_handler(navigate,
                                        inline.cd.filter(),
                                        state='*'

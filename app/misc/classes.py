@@ -45,3 +45,13 @@ async def create_device(data: dict) -> Device:
         change_date = data.get('change_date', get_now_datetime()),
         user_id = data.get('user_id')
     )
+
+async def get_device_view(device: Device) -> str:
+            return (
+            f'<b>{device.name}</b>\n'
+            f'IP: {device.ip}\n'
+            f'Статус: {device.status}\n'
+            f'Не турбувати вночі: {("🔴", "🟢")[device.do_not_disturb]}\n'
+            f'Сповіщати: {("🔴", "🟢")[device.notify]}\n'
+            f'Остання зміна: {get_now_formatted(device.change_date)}'
+        )
