@@ -10,11 +10,12 @@ from app.config import load_config, Config
 from app.middlewares.event_handling import DelMessage, CallbackAnswer
 
 from app.handlers.start import register_start
+from app.handlers.back import register_back
 from app.handlers.help import register_help
 from app.handlers.registration import register_reg
-from app.handlers.back import register_back
-from app.handlers.echo import register_echo
 from app.handlers.device_list import register_device_list
+from app.handlers.device_management import register_device_management
+from app.handlers.echo import register_echo
 
 from app.data.db_api import db_create_tables
 
@@ -40,10 +41,11 @@ def register_all_filters(dp: Dispatcher):
 
 def register_all_handlers(dp: Dispatcher):
     register_start(dp)
+    register_back(dp)
     register_help(dp)
     register_reg(dp)
-    register_back(dp)
     register_device_list(dp)
+    register_device_management(dp)
     register_echo(dp)
 
 

@@ -53,10 +53,10 @@ async def db_get_device(device_id: int) -> Device:
             device_row = await conn.fetchrow(
                 f'SELECT * FROM devices '
                 f'WHERE id=$1',
-                device_id
+                int(device_id)
             )
-            device = await create_device(device_row)
-            return device
+        device = await create_device(device_row)
+        return device
     except:
         return None
 
