@@ -29,7 +29,7 @@ logger = logging.getLogger(__name__)
 # the order of the call is fundamental
 def register_all_middlewares(dp: Dispatcher, config: Config):
     # dp.setup_middleware(EnvironmentMiddleware(config=config))
-    dp.setup_middleware(DelMessage())
+    # dp.setup_middleware(DelMessage())
     dp.setup_middleware(CallbackAnswer())
 
 

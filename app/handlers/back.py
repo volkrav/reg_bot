@@ -20,7 +20,7 @@ async def command_back(message: types.Message, state: FSMContext):
     await current_function(message, state)
 
 
-async def _get_current_function(current_state: FSMContext):
+async def _get_current_function(current_state: str):
     match (current_state, None):
         case state, _ if (not state) or\
                 state.split(':')[0] in ('Start',

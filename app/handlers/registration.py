@@ -9,6 +9,7 @@ from app.misc.classes import CheckIn, Start
 from app.misc.classes import create_device
 from app.handlers.back import command_back, command_start
 from app.data.db_api import db_add_device
+from app.misc.utils import check_ip
 
 
 logger = logging.getLogger(__name__)
@@ -52,13 +53,24 @@ async def enter_name(message: types.Message, state: FSMContext):
 
 
 async def enter_ip(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['ip'] = message.text
-    await CheckIn.disturb.set()
-    await message.answer(
-        text='Ввімкнути функцію "Не турбувати вночі:"',
-        reply_markup=reply.kb_yes_or_no
-    )
+    if await check_ip(message.text):
+        async with state.proxy() as data:
+            data['ip'] = message.text
+        await CheckIn.do_not_disturb.set()
+        await message.answer(
+            text='Ввімкнути функцію "Не турбувати вночі:"',
+            reply_markup=reply.kb_yes_or_no
+        )
+    else:
+        await message.reply(
+            text='‼️ Невірний формат IP адреси ‼️\n\n' +
+            'IP-адреси є набір з чотирьох чисел, розділених точками, ' +
+            'наприклад, 192.158.1.38. Кожне число цього набору належить ' +
+            'інтервалу від 0 до 255. Таким чином, повний діапазон ' +
+            'IP-адресації – це адреси від 0.0.0.0 до 255.255.255.255\n\n' +
+            'Введіть, будь ласка, коректне значення IP пристрою  ⤵️',
+            reply_markup=reply.btn_cancel
+        )
 
 
 async def is_disturb(message: types.Message, state: FSMContext):
@@ -102,4 +114,4 @@ def register_reg(dp: Dispatcher):
     dp.register_message_handler(enter_ip,
                                 state=CheckIn.ip)
     dp.register_message_handler(is_disturb,
-                                state=CheckIn.disturb)
+                                state=CheckIn.do_not_disturb)

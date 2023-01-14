@@ -15,7 +15,7 @@ class NeedHelp(StatesGroup):
 class CheckIn(StatesGroup):
     name = State()
     ip = State()
-    disturb = State()
+    do_not_disturb = State()
     canceled = State()
 
 class DeviceList(StatesGroup):
@@ -28,7 +28,7 @@ class DeviceAction(StatesGroup):
 class DeviceChange(StatesGroup):
     name = State()
     ip = State()
-    disturb = State()
+    do_not_disturb = State()
     notify = State()
     canceled = State()
 

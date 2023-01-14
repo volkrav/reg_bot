@@ -50,7 +50,7 @@ kb_change = ReplyKeyboardMarkup(
             KeyboardButton(text='Сповіщати'),
         ],
         [
-            btn_cancel,
+            btn_back,
         ],
     ],
         resize_keyboard=True
@@ -75,10 +75,10 @@ kb_yes_or_no = ReplyKeyboardMarkup(
 kb_on_off_cancel = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='🟢 Увімкнути')
+            KeyboardButton(text='🟢 ввімкнено')
         ],
         [
-            KeyboardButton(text='🔴 Вимкнути')
+            KeyboardButton(text='🔴 вимкнено')
         ],
         [
             btn_cancel
