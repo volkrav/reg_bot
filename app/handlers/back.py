@@ -28,7 +28,7 @@ async def _get_current_function(current_state: FSMContext):
     # }
     # return functions.get(current_state, command_start)
     match (current_state, None):
-        case 'DeviceList:change_device', _:
+        case 'DeviceAction:change_device', _:
             return command_my_device_list
         case state, _ if (not state) \
                 or state.split(':')[0] in ('Start',

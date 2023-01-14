@@ -7,7 +7,7 @@ cd = CallbackData('action', 'device_id')
 def make_callbackdata(action: str, device_id: str) -> CallbackData:
     return cd.new(device_id=f'{action}-{device_id}')
 
-async def device_keyboard(device_id) -> InlineKeyboardMarkup:
+async def create_device_keyboard(device_id) -> InlineKeyboardMarkup:
 
     markup = InlineKeyboardMarkup()
     button_change_text = InlineKeyboardButton(

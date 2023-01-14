@@ -20,8 +20,11 @@ class CheckIn(StatesGroup):
 
 class DeviceList(StatesGroup):
     show_device_list = State()
+
+class DeviceAction(StatesGroup):
     del_device = State()
     change_device = State()
+
 
 class Device(NamedTuple):
     id: int | None
