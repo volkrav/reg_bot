@@ -77,6 +77,26 @@ async def db_delete_device(device_id: int) -> None:
             f'<db_delete_device> BAD get {err.args}'
         )
 
+async def db_update_device(device_id: int, field: str, new_value:str):
+    try:
+        async with UseDataBase() as conn:
+            await conn.execute(
+                f'UPDATE devices '
+                f'SET {field} = $1 '
+                f'WHERE id={device_id}',
+                new_value
+            )
+        logger.info(
+            f'<db_update_device> OK update {device_id}'
+        )
+    except Exception as err:
+        logger.error(
+            f'<db_update_device> BAD get {err.args}'
+        )
+
+    '''UPDATE products SET price = 10 WHERE price = 5;'''
+
+
 async def _insert(tablename: str, column_values: Dict):
     columns = ', '.join(column_values.keys())
     values = tuple(column_values.values())

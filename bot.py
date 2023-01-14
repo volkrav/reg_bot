@@ -28,7 +28,6 @@ logger = logging.getLogger(__name__)
 # register middleware, filters and handlers,
 # the order of the call is fundamental
 def register_all_middlewares(dp: Dispatcher, config: Config):
-    pass
     # dp.setup_middleware(EnvironmentMiddleware(config=config))
     dp.setup_middleware(DelMessage())
     dp.setup_middleware(CallbackAnswer())
@@ -36,7 +35,7 @@ def register_all_middlewares(dp: Dispatcher, config: Config):
 
 def register_all_filters(dp: Dispatcher):
     # dp.filters_factory.bind(AdminFilter)
-    pass
+    ...
 
 
 def register_all_handlers(dp: Dispatcher):

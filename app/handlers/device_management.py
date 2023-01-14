@@ -6,16 +6,20 @@ from aiogram.dispatcher.filters import Text
 
 from app.handlers.device_list import command_my_device_list
 from app.keyboards import reply, inline
-from app.data.db_api import get_all_users_devices, db_delete_device, db_get_device
-from app.misc.classes import DeviceAction, get_device_view, Device
+from app.data.db_api import db_delete_device, db_get_device, db_update_device
+from app.misc.classes import DeviceAction, DeviceChange, Device
+from app.misc.classes import get_device_view
 from app.misc.utils import get_now_formatted, get_user_id
 
 
 logger = logging.getLogger(__name__)
 
 
-async def preparing_to_remove_device(message: types.Message, state: FSMContext, device: Device | None):
+async def preparing_to_remove_device(message: types.Message, state: FSMContext):
     user_id = await get_user_id(message)
+    async with state.proxy() as data:
+        device = data.get('device')
+
     if not device:
         logger.warning(
             f'<preparing_to_remove_device> BAD {user_id} tried to change a deleted device'
@@ -42,8 +46,10 @@ async def preparing_to_remove_device(message: types.Message, state: FSMContext, 
         await command_my_device_list(message, state)
 
 
-async def preparing_to_change_device(message: types.Message, state: FSMContext, device: Device | None):
+async def preparing_to_change_device(message: types.Message, state: FSMContext):
     user_id = await get_user_id(message)
+    async with state.proxy() as data:
+        device = data.get('device')
     if not device:
         logger.warning(
             f'<change_device> OK {user_id} tried to change a deleted device'
@@ -51,6 +57,8 @@ async def preparing_to_change_device(message: types.Message, state: FSMContext, 
         await message.answer('Цей пристрій був видалений раніше')
         return await command_my_device_list(message, state)
     await DeviceAction.change_device.set()
+    async with state.proxy() as data:
+        data['device'] = device
     answer = (
         '✏️ Пристрій:\n\n' + await get_device_view(device) +
         '\n\n' +
@@ -69,9 +77,10 @@ async def action_choice(call: types.CallbackQuery, state: FSMContext, callback_d
         'change': preparing_to_change_device,
     }
     current_function = functions.get(action)
-    device = await db_get_device(device_id)
+    async with state.proxy() as data:
+        data['device'] = await db_get_device(device_id)
 
-    await current_function(call.message, state, device)
+    await current_function(call.message, state)
 
 
 async def answer_yes_or_no(message: types.Message, state: FSMContext):
@@ -83,15 +92,68 @@ async def answer_yes_or_no(message: types.Message, state: FSMContext):
 
 
 async def select_field_to_change(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        device: Device = data.get('device')
     match (message.text, None):
         case 'Назву', _:
-            await message.answer('Змінюємо назву')
+            await message.answer(
+                f'Поточна назва:\n<b>{device.name}</b>'
+            )
+            await DeviceChange.name.set()
+            await message.answer(
+                text="Введіть нову назву пристрою ⤵️",
+                reply_markup=reply.kb_cancel
+            )
         case 'IP', _:
-            await message.answer('Змінюємо IP')
+            await message.answer(
+                f'Поточна IP:\n<b>{device.ip}</b>'
+            )
+            await DeviceChange.ip.set()
+            await message.answer(
+                text="Введіть нове значення IP пристрою ⤵️",
+                reply_markup=reply.kb_cancel
+            )
         case 'Не турбувати', _:
-            await message.answer('Змінюємо Не турбувати')
+            curr_state_disturb = (
+                '🟢 ввімкнено' if device.do_not_disturb else '🔴 вимкнено'
+            )
+            await message.answer(
+                f'Поточний стан фунції "Не турбувати вночі": \n'
+                f'<b>{curr_state_disturb}</b>')
+            await DeviceChange.disturb.set()
+            await message.answer(
+                'Виберіть новий стан  ⤵️',
+                reply_markup=reply.kb_on_off_cancel
+            )
         case 'Сповіщати', _:
-            await message.answer('Змінюємо Сповіщати')
+            curr_state_notify = (
+                '🟢 ввімкнено' if device.notify else '🔴 вимкнено'
+            )
+            await message.answer(
+                f'Поточний стан фунції "Не турбувати вночі": \n'
+                f'<b>{curr_state_notify}</b>')
+            await DeviceChange.notify.set()
+            await message.answer(
+                'Виберіть новий стан  ⤵️',
+                reply_markup=reply.kb_on_off_cancel
+            )
+        case _:
+            await preparing_to_change_device(message, state)
+
+
+async def update_device(message: types.Message, state: FSMContext):
+    async with state.proxy() as data:
+        device: Device = data.get('device')
+    match (await state.get_state(), message.text):
+        case 'DeviceChange:name', new_value:
+            await db_update_device(device.id, 'name', new_value)
+            await message.answer(
+                f'Вдало змінено назву з <b>{device.name}</b> '
+                f'на <b>{new_value}</b>'
+            )
+    async with state.proxy() as data:
+        data['device'] = await db_get_device(device.id)
+    await preparing_to_change_device(message, state)
 
 
 async def delete_device(message: types.Message, state: FSMContext):
@@ -129,3 +191,5 @@ def register_device_management(dp: Dispatcher):
                                      ignore_case=True),
                                 state='DeviceAction:change_device'
                                 )
+    dp.register_message_handler(update_device,
+                                state=DeviceChange.all_states)

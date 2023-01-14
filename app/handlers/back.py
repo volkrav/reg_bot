@@ -6,6 +6,7 @@ from aiogram.dispatcher.filters import Text
 
 from app.handlers.start import command_start
 from app.handlers.device_list import command_my_device_list
+from app.handlers.device_management import select_field_to_change
 
 
 logger = logging.getLogger(__name__)
@@ -20,22 +21,17 @@ async def command_back(message: types.Message, state: FSMContext):
 
 
 async def _get_current_function(current_state: FSMContext):
-    # functions = {
-    #     None: command_start,
-    #     'Start:free': command_start,
-    #     'CheckIn:canceled': command_start,  # TODO!
-    #     'DeviceList:show_device_list': command_start,
-    # }
-    # return functions.get(current_state, command_start)
     match (current_state, None):
-        case 'DeviceAction:change_device', _:
-            return command_my_device_list
-        case state, _ if (not state) \
-                or state.split(':')[0] in ('Start',
+        case state, _ if (not state) or\
+                state.split(':')[0] in ('Start',
                                            'CheckIn',
                                            'DeviceList',
                                            'NeedHelp'):
             return command_start
+        case 'DeviceAction:change_device', _:
+            return command_my_device_list
+        case state, _ if state.split(':')[0] == 'DeviceChange':
+            return select_field_to_change
 
 
 def register_back(dp: Dispatcher):

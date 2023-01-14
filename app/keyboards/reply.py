@@ -70,6 +70,22 @@ kb_yes_or_no = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+'''************************ Так Ні ************************'''
+
+kb_on_off_cancel = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text='🟢 Увімкнути')
+        ],
+        [
+            KeyboardButton(text='🔴 Вимкнути')
+        ],
+        [
+            btn_cancel
+        ],
+    ],
+    resize_keyboard=True
+)
 
 '''************************ Скасувати ************************'''
 

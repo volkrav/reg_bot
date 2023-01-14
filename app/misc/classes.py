@@ -25,6 +25,12 @@ class DeviceAction(StatesGroup):
     del_device = State()
     change_device = State()
 
+class DeviceChange(StatesGroup):
+    name = State()
+    ip = State()
+    disturb = State()
+    notify = State()
+    canceled = State()
 
 class Device(NamedTuple):
     id: int | None
