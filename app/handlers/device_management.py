@@ -3,6 +3,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
 from aiogram.dispatcher.filters import Text
+import aiogram.utils.markdown as fmt
 
 from app.handlers.device_list import command_my_device_list
 from app.handlers.echo import echo
@@ -10,7 +11,8 @@ from app.keyboards import reply, inline
 from app.data.db_api import db_delete_device, db_get_device, db_update_device
 from app.misc.classes import DeviceAction, DeviceChange, Device
 from app.misc.classes import get_device_view
-from app.misc.utils import get_now_formatted, get_user_id
+from app.misc.utils import get_user_id, check_ip, reply_not_validation_ip
+from app.misc.utils import check_name, reply_not_validation_name
 
 
 logger = logging.getLogger(__name__)
@@ -104,21 +106,34 @@ async def select_field_to_change(message: types.Message, state: FSMContext):
 
 
 async def update_device(message: types.Message, state: FSMContext):
+    is_check = True
     async with state.proxy() as data:
         device: Device = data.get('device')
-    match (await state.get_state(), message.text):
+    match (await state.get_state(), fmt.quote_html(message.text)):
         case 'DeviceChange:name', new_name:
-            await db_update_device(device.id, 'name', new_name)
-            await message.answer(
-                f'Вдало змінено назву з <b>{device.name}</b> '
-                f'на <b>{new_name}</b>'
-            )
+            if await check_name(new_name):
+                await db_update_device(device.id, 'name', new_name)
+                await message.answer(
+                    f'Вдало змінено назву з <b>{device.name}</b> '
+                    f'на <b>{new_name}</b>'
+                )
+                logger.warning(
+                    f'<update_device> OK {message.from_user.id} to changed {device.name} on {new_name}'
+                )
+
+            else:
+                is_check = False
+                await reply_not_validation_name(message)
         case 'DeviceChange:ip', new_ip:
-            await db_update_device(device.id, 'ip', new_ip)
-            await message.answer(
-                f'Вдало змінено IP з <b>{device.ip}</b> '
-                f'на <b>{new_ip}</b>'
-            )
+            if await check_ip(new_ip):
+                await db_update_device(device.id, 'ip', new_ip)
+                await message.answer(
+                    f'Вдало змінено IP з <b>{device.ip}</b> '
+                    f'на <b>{new_ip}</b>'
+                )
+            else:
+                is_check = False
+                await reply_not_validation_ip(message)
         case 'DeviceChange:do_not_disturb', new_state \
                 if new_state in ('🟢 ввімкнено', '🔴 вимкнено'):
             curr_state_do_not_disturb = (
@@ -152,9 +167,10 @@ async def update_device(message: types.Message, state: FSMContext):
                 )
         case _:
             return await echo(message, state)
-    async with state.proxy() as data:
-        data['device'] = await db_get_device(device.id)
-    await preparing_to_change_device(message, state)
+    if is_check:
+        async with state.proxy() as data:
+            data['device'] = await db_get_device(device.id)
+        await preparing_to_change_device(message, state)
 
 
 async def preparing_to_delete_device(message: types.Message, state: FSMContext):

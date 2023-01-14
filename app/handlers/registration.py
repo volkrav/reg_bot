@@ -3,13 +3,16 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 
 from aiogram.dispatcher.filters import Text
+import aiogram.utils.markdown as fmt
+
 
 from app.keyboards import reply
 from app.misc.classes import CheckIn, Start
 from app.misc.classes import create_device
 from app.handlers.back import command_back, command_start
 from app.data.db_api import db_add_device
-from app.misc.utils import check_ip
+from app.misc.utils import check_ip, reply_not_validation_ip
+from app.misc.utils import check_name, reply_not_validation_name
 
 
 logger = logging.getLogger(__name__)
@@ -42,35 +45,30 @@ async def command_cancel(message: types.Message, state: FSMContext):
 
 
 async def enter_name(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['user_id'] = message.from_user.id
-        data['name'] = message.text
-    await CheckIn.ip.set()
-    await message.answer(
-        text="Введіть IP пристрою  ⤵️",
-        reply_markup=reply.kb_cancel
-    )
+    if await check_name(fmt.quote_html(message.text)):
+        async with state.proxy() as data:
+            data['user_id'] = message.from_user.id
+            data['name'] = fmt.quote_html(message.text)
+        await CheckIn.ip.set()
+        await message.answer(
+            text="Введіть IP пристрою  ⤵️",
+            reply_markup=reply.kb_cancel
+        )
+    else:
+        await reply_not_validation_name(message)
 
 
 async def enter_ip(message: types.Message, state: FSMContext):
-    if await check_ip(message.text):
+    if await check_ip(fmt.quote_html(message.text)):
         async with state.proxy() as data:
-            data['ip'] = message.text
+            data['ip'] = fmt.quote_html(message.text)
         await CheckIn.do_not_disturb.set()
         await message.answer(
-            text='Ввімкнути функцію "Не турбувати вночі:"',
+            text='Ввімкнути функцію "Не турбувати вночі"?',
             reply_markup=reply.kb_yes_or_no
         )
     else:
-        await message.reply(
-            text='‼️ Невірний формат IP адреси ‼️\n\n' +
-            'IP-адреси є набір з чотирьох чисел, розділених точками, ' +
-            'наприклад, 192.158.1.38. Кожне число цього набору належить ' +
-            'інтервалу від 0 до 255. Таким чином, повний діапазон ' +
-            'IP-адресації – це адреси від 0.0.0.0 до 255.255.255.255\n\n' +
-            'Введіть, будь ласка, коректне значення IP пристрою  ⤵️',
-            reply_markup=reply.btn_cancel
-        )
+        await reply_not_validation_ip(message)
 
 
 async def is_disturb(message: types.Message, state: FSMContext):

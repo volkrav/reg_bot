@@ -63,7 +63,6 @@ async def main():
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
     dp = Dispatcher(bot=bot, storage=MemoryStorage())
 
-
     await db_create_tables()
 
     # для зручності використання config, щоб отримувати його не через
