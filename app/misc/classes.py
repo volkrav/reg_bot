@@ -1,8 +1,9 @@
+import datetime
 from typing import NamedTuple
 
 from aiogram.dispatcher.filters.state import StatesGroup, State
 
-from app.misc.utils import get_now_formatted, datetime, get_now_datetime
+from app.misc.utils import get_now_formatted, get_now_datetime, get_now_datetime_minus_an_hour
 
 class Start(StatesGroup):
     free = State()
@@ -41,6 +42,7 @@ class Device(NamedTuple):
     notify: bool
     change_date: datetime.datetime | str
     user_id: int
+    last_check: datetime.datetime | str
 
 
 async def create_device(data: dict) -> Device:
@@ -51,8 +53,9 @@ async def create_device(data: dict) -> Device:
         status = data.get('status', ''),
         do_not_disturb = data.get('do_not_disturb'),
         notify = data.get('notify', True),
-        change_date = data.get('change_date', get_now_datetime()),
-        user_id = data.get('user_id')
+        change_date = data.get('change_date', await get_now_datetime()),
+        user_id = data.get('user_id'),
+        last_check = data.get('last_check', await get_now_datetime_minus_an_hour())
     )
 
 async def get_device_view(device: Device) -> str:
@@ -60,7 +63,7 @@ async def get_device_view(device: Device) -> str:
             f'<b>{device.name}</b>\n'
             f'IP: {device.ip}\n'
             f'Статус: {device.status}\n'
-            f'Не турбувати вночі: {("🔴", "🟢")[device.do_not_disturb]}\n'
-            f'Сповіщати: {("🔴", "🟢")[device.notify]}\n'
-            f'Остання зміна: {get_now_formatted(device.change_date)}'
+            f'Не турбувати вночі: {("🔴 вимкнено", "🟢 ввімкнено")[device.do_not_disturb]}\n'
+            f'Сповіщати: {("🔴 вимкнено", "🟢 ввімкнено")[device.notify]}\n'
+            f'Остання зміна: {await get_now_formatted(device.change_date)}'
         )

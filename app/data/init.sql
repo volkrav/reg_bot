@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS "devices" (
 	"notify" BOOLEAN NOT NULL DEFAULT TRUE,
 	"change_date" timestamptz NOT NULL,
 	"user_id" bigint NOT NULL,
+    "last_check" timestamptz NOT NULL,
 	CONSTRAINT "devices_pk" PRIMARY KEY ("id"),
     CONSTRAINT "devices_fk0"
     FOREIGN KEY ("user_id")

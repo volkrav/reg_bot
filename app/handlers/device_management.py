@@ -112,7 +112,11 @@ async def update_device(message: types.Message, state: FSMContext):
     match (await state.get_state(), fmt.quote_html(message.text)):
         case 'DeviceChange:name', new_name:
             if await check_name(new_name):
-                await db_update_device(device.id, 'name', new_name)
+                await db_update_device(device.id,
+                                       {
+                                           'name': new_name
+                                       }
+                                       )
                 await message.answer(
                     f'Вдало змінено назву з <b>{device.name}</b> '
                     f'на <b>{new_name}</b>'
@@ -126,7 +130,11 @@ async def update_device(message: types.Message, state: FSMContext):
                 await reply_not_validation_name(message)
         case 'DeviceChange:ip', new_ip:
             if await check_ip(new_ip):
-                await db_update_device(device.id, 'ip', new_ip)
+                await db_update_device(device.id,
+                                       {
+                                           'ip': new_ip
+                                       }
+                                       )
                 await message.answer(
                     f'Вдало змінено IP з <b>{device.ip}</b> '
                     f'на <b>{new_ip}</b>'
@@ -140,11 +148,11 @@ async def update_device(message: types.Message, state: FSMContext):
                 '🟢 ввімкнено' if device.do_not_disturb else '🔴 вимкнено'
             )
             if curr_state_do_not_disturb != new_state:
-                await db_update_device(
-                    device.id,
-                    'do_not_disturb',
-                    not device.do_not_disturb
-                )
+                await db_update_device(device.id,
+                                       {
+                                           'do_not_disturb': not device.do_not_disturb
+                                       }
+                                       )
                 await message.answer(
                     f'Вдало змінено стан фунції "Не турбувати вночі"'
                     f'з <b>{curr_state_do_not_disturb}</b> '
@@ -156,10 +164,11 @@ async def update_device(message: types.Message, state: FSMContext):
                 '🟢 ввімкнено' if device.notify else '🔴 вимкнено'
             )
             if curr_state_notify != new_state:
-                await db_update_device(
-                    device.id,
-                    'notify',
-                    not device.notify
+                await db_update_device(device.id,
+                {
+                    'notify': not device.notify,
+                    'status': ''
+                }
                 )
                 await message.answer(
                     f'Вдало змінено стан фунції "Не турбувати вночі" з <b>{curr_state_notify}</b> '

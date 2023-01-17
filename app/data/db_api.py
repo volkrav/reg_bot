@@ -4,7 +4,7 @@ from typing import Dict, List, Tuple, Union
 
 from app.data.DBcm import UseDataBase
 from app.misc.classes import Device, create_device
-from app.misc.utils import get_now_datetime, get_now_formatted
+from app.misc.utils import get_now_datetime, get_now_formatted, get_now_datetime_minus_an_hour
 
 
 logger = logging.getLogger(__name__)
@@ -23,7 +23,7 @@ async def db_add_device(device: Device):
         await _insert('users',
                       {
                           'user_id': device.user_id,
-                          'reg_date': get_now_datetime()
+                          'reg_date': await get_now_datetime()
                       })
     await _insert('devices',
                   {
@@ -33,7 +33,8 @@ async def db_add_device(device: Device):
                       'do_not_disturb': device.do_not_disturb,
                       'notify': device.notify,
                       'change_date': device.change_date,
-                      'user_id': device.user_id
+                      'user_id': device.user_id,
+                      'last_check': await get_now_datetime_minus_an_hour()
                   })
 
 
@@ -77,14 +78,21 @@ async def db_delete_device(device_id: int) -> None:
             f'<db_delete_device> BAD get {err.args}'
         )
 
-async def db_update_device(device_id: int, field: str, new_value:str):
+async def db_update_device(device_id: int, column_newvalues: dict):
+    columns = [column for column in column_newvalues.keys()]
+    placeholders = [f'${i+1}' for i in range(len(column_newvalues.keys()))]
+    set_condition = ', '.join([f'{column}={placeholder}'
+                               for column, placeholder in zip(columns, placeholders)])
+    new_values = [value for value in column_newvalues.values()]
+
     try:
         async with UseDataBase() as conn:
             await conn.execute(
                 f'UPDATE devices '
-                f'SET {field} = $1 '
-                f'WHERE id={device_id}',
-                new_value
+                f'SET {set_condition} '
+                f'WHERE id=${len(placeholders)+1}',
+                *new_values,
+                device_id
             )
         logger.info(
             f'<db_update_device> OK update {device_id}'

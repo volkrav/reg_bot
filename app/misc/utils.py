@@ -8,18 +8,21 @@ from app.keyboards import reply
 TZ = pytz.timezone("Europe/Kiev")
 
 
-def get_now_datetime() -> datetime.datetime:
+async def get_now_datetime() -> datetime.datetime:
     now = datetime.datetime.now(TZ)
     return now
 
 
-def get_now_formatted(dt: datetime.datetime = None) -> str:
+async def get_now_formatted(dt: datetime.datetime = None) -> str:
     if not dt:
-        dt = get_now_datetime()
+        dt = await get_now_datetime()
     return dt.strftime("%H:%M:%S %d-%m-%Y")
 
+async def get_now_datetime_minus_an_hour():
+    now_minus_hour = await get_now_datetime() - datetime.timedelta(hours=1)
+    return now_minus_hour
 
-def is_day() -> bool:
+async def is_day() -> bool:
     return 7 < datetime.datetime.now(TZ).hour < 24
 
 
