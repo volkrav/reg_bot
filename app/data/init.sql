@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "devices" (
 	"id" serial NOT NULL,
 	"name" varchar(50) NOT NULL,
 	"ip" varchar(50) NOT NULL,
-    "status" varchar(10),
+    "status" varchar(50),
 	"do_not_disturb" BOOLEAN NOT NULL,
 	"notify" BOOLEAN NOT NULL DEFAULT TRUE,
 	"change_date" timestamptz NOT NULL,

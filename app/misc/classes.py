@@ -50,7 +50,7 @@ async def create_device(data: dict) -> Device:
         id = data.get('id', None),
         name = data.get('name'),
         ip = data.get('ip'),
-        status = data.get('status', ''),
+        status = data.get('status', 'Не відстежується'),
         do_not_disturb = data.get('do_not_disturb'),
         notify = data.get('notify', True),
         change_date = data.get('change_date', await get_now_datetime()),

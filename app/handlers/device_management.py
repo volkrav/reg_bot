@@ -165,11 +165,11 @@ async def update_device(message: types.Message, state: FSMContext):
             )
             if curr_state_notify != new_state:
                 await db_update_device(device.id,
-                {
-                    'notify': not device.notify,
-                    'status': ''
-                }
-                )
+                                       {
+                                           'notify': not device.notify,
+                                           'status': 'Не відстежується'
+                                       }
+                                       )
                 await message.answer(
                     f'Вдало змінено стан фунції "Не турбувати вночі" з <b>{curr_state_notify}</b> '
                     f'на <b>{new_state}</b>'
