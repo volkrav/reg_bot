@@ -18,16 +18,10 @@ async def get_now_formatted(dt: datetime.datetime = None) -> str:
         dt = await get_now_datetime()
     return dt.strftime("%H:%M:%S %d-%m-%Y")
 
+
 async def get_now_datetime_minus_an_hour():
     now_minus_hour = await get_now_datetime() - datetime.timedelta(hours=1)
     return now_minus_hour
-
-async def is_day() -> bool:
-    return 7 < datetime.datetime.now(TZ).hour < 24
-
-
-async def is_device_exists(message: types.Message):
-    ...
 
 
 async def get_user_id(message: types.Message):
@@ -60,13 +54,12 @@ async def reply_not_validation_ip(message: types.Message):
 
 
 async def check_name(name: str = None) -> bool:
-    print(name)
     return isinstance(name, str) and (len(name) < 50)
 
 
 async def reply_not_validation_name(message: types.Message):
     await message.reply(
         text='‼️ Назва не повинна перевищувати 50 символів ‼️\n\n' +
-        'Будь ласка, придумайта та введіть коротшу назву пристрою  ⤵️',
+        'Будь ласка, придумайте та введіть коротшу назву пристрою  ⤵️',
         reply_markup=reply.kb_cancel
     )

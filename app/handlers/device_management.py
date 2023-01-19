@@ -1,19 +1,19 @@
 import logging
+
+import aiogram.utils.markdown as fmt
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-
 from aiogram.dispatcher.filters import Text
-import aiogram.utils.markdown as fmt
 
+from app.data.db_api import db_delete_device, db_get_device, db_update_device
+from app.handlers.start import command_start
 from app.handlers.device_list import command_my_device_list
 from app.handlers.echo import echo
-from app.keyboards import reply, inline
-from app.data.db_api import db_delete_device, db_get_device, db_update_device
-from app.misc.classes import DeviceAction, DeviceChange, Device
-from app.misc.classes import get_device_view
-from app.misc.utils import get_user_id, check_ip, reply_not_validation_ip
-from app.misc.utils import check_name, reply_not_validation_name
-
+from app.keyboards import inline, reply
+from app.misc.classes import (Device, DeviceAction, DeviceChange,
+                              ConnectionErrorDB, get_device_view)
+from app.misc.utils import (check_ip, check_name, get_user_id,
+                            reply_not_validation_ip, reply_not_validation_name)
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +25,19 @@ async def action_choice(call: types.CallbackQuery, state: FSMContext, callback_d
         'del': preparing_to_delete_device,
     }
     current_function = functions.get(action)
-    async with state.proxy() as data:
-        data['device'] = await db_get_device(device_id)
-
+    try:
+        async with state.proxy() as data:
+            data['device'] = await db_get_device(device_id)
+    except ConnectionErrorDB:
+        await call.message.answer(
+            '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+            '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+            'Спробуйте повторити запит через деякий час.'
+        )
+        logger.warning(
+            f'<action_choice> BAD {call.message.chat.id} get ConnectionErrorDB'
+        )
+        return await command_start(call.message, state)
     await current_function(call.message, state)
 
 
@@ -110,35 +120,58 @@ async def update_device(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         device: Device = data.get('device')
     match (await state.get_state(), fmt.quote_html(message.text)):
+
         case 'DeviceChange:name', new_name:
             if await check_name(new_name):
-                await db_update_device(device.id,
-                                       {
-                                           'name': new_name
-                                       }
-                                       )
-                await message.answer(
-                    f'Вдало змінено назву з <b>{device.name}</b> '
-                    f'на <b>{new_name}</b>'
-                )
-                logger.warning(
-                    f'<update_device> OK {message.from_user.id} to changed {device.name} on {new_name}'
-                )
-
+                try:
+                    await db_update_device(device.id,
+                                           {
+                                               'name': new_name
+                                           }
+                                           )
+                    await message.answer(
+                        f'Вдало змінено назву з <b>{device.name}</b> '
+                        f'на <b>{new_name}</b>'
+                    )
+                    logger.warning(
+                        f'<update_device> OK {message.from_user.id} to changed {device.name} on {new_name}'
+                    )
+                except ConnectionErrorDB:
+                    await message.answer(
+                        '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                        '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                        'Спробуйте повторити запит через деякий час.'
+                    )
+                    logger.warning(
+                        f'<command_my_device_list:check_name> BAD {message.from_user.id} get ConnectionErrorDB'
+                    )
+                    return await command_start(message, state)
             else:
                 is_check = False
                 await reply_not_validation_name(message)
+
         case 'DeviceChange:ip', new_ip:
             if await check_ip(new_ip):
-                await db_update_device(device.id,
-                                       {
-                                           'ip': new_ip
-                                       }
-                                       )
-                await message.answer(
-                    f'Вдало змінено IP з <b>{device.ip}</b> '
-                    f'на <b>{new_ip}</b>'
-                )
+                try:
+                    await db_update_device(device.id,
+                                           {
+                                               'ip': new_ip
+                                           }
+                                           )
+                    await message.answer(
+                        f'Вдало змінено IP з <b>{device.ip}</b> '
+                        f'на <b>{new_ip}</b>'
+                    )
+                except ConnectionErrorDB:
+                    await message.answer(
+                        '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                        '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                        'Спробуйте повторити запит через деякий час.'
+                    )
+                    logger.warning(
+                        f'<command_my_device_list:check_ip> BAD {message.from_user.id} get ConnectionErrorDB'
+                    )
+                    return await command_start(message, state)
             else:
                 is_check = False
                 await reply_not_validation_ip(message)
@@ -148,38 +181,74 @@ async def update_device(message: types.Message, state: FSMContext):
                 '🟢 ввімкнено' if device.do_not_disturb else '🔴 вимкнено'
             )
             if curr_state_do_not_disturb != new_state:
-                await db_update_device(device.id,
-                                       {
-                                           'do_not_disturb': not device.do_not_disturb
-                                       }
-                                       )
-                await message.answer(
-                    f'Вдало змінено стан фунції "Не турбувати вночі"'
-                    f'з <b>{curr_state_do_not_disturb}</b> '
-                    f'на <b>{new_state}</b>'
-                )
+                try:
+                    await db_update_device(device.id,
+                                           {
+                                               'do_not_disturb': not device.do_not_disturb
+                                           }
+                                           )
+                    await message.answer(
+                        f'Вдало змінено стан фунції "Не турбувати вночі"'
+                        f'з <b>{curr_state_do_not_disturb}</b> '
+                        f'на <b>{new_state}</b>'
+                    )
+                except ConnectionErrorDB:
+                    await message.answer(
+                        '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                        '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                        'Спробуйте повторити запит через деякий час.'
+                    )
+                    logger.warning(
+                        f'<command_my_device_list:do_not_disturb> BAD {message.from_user.id} get ConnectionErrorDB'
+                    )
+                    return await command_start(message, state)
+
         case 'DeviceChange:notify', new_state \
                 if new_state in ('🟢 ввімкнено', '🔴 вимкнено'):
             curr_state_notify = (
                 '🟢 ввімкнено' if device.notify else '🔴 вимкнено'
             )
             if curr_state_notify != new_state:
-                await db_update_device(device.id,
-                                       {
-                                           'notify': not device.notify,
-                                           'status': 'Не відстежується'
-                                       }
-                                       )
-                await message.answer(
-                    f'Вдало змінено стан фунції "Не турбувати вночі" з <b>{curr_state_notify}</b> '
-                    f'на <b>{new_state}</b>'
-                )
+                try:
+                    await db_update_device(device.id,
+                                           {
+                                               'notify': not device.notify,
+                                               'status': 'Не відстежується'
+                                           }
+                                           )
+                    await message.answer(
+                        f'Вдало змінено стан фунції "Не турбувати вночі" з <b>{curr_state_notify}</b> '
+                        f'на <b>{new_state}</b>'
+                    )
+                except ConnectionErrorDB:
+                    await message.answer(
+                        '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                        '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                        'Спробуйте повторити запит через деякий час.'
+                    )
+                    logger.warning(
+                        f'<command_my_device_list:notify> BAD {message.from_user.id} get ConnectionErrorDB'
+                    )
+                    return await command_start(message, state)
+
         case _:
             return await echo(message, state)
+
     if is_check:
-        async with state.proxy() as data:
-            data['device'] = await db_get_device(device.id)
-        await preparing_to_change_device(message, state)
+        try:
+            async with state.proxy() as data:
+                data['device'] = await db_get_device(device.id)
+            await preparing_to_change_device(message, state)
+        except ConnectionErrorDB:
+            await message.answer(
+                '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                'Спробуйте повторити запит через деякий час.'
+            )
+            logger.warning(
+                f'<update_device> BAD {message.chat.id} get ConnectionErrorDB'
+            )
+            return await command_start(message, state)
 
 
 async def preparing_to_delete_device(message: types.Message, state: FSMContext):
@@ -224,16 +293,26 @@ async def answer_yes_or_no(message: types.Message, state: FSMContext):
 async def delete_device(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         device: Device = data.get('device')
-
-    await db_delete_device(device.id)
-    logger.info(
-        f'<delete_device> OK {message.from_user.id} deleted {device.name}'
-    )
-    await message.answer(
-        f'Пристрій <b>{device.name}</b> був вдало видалений.'
-    )
-    await state.finish()
-    await command_my_device_list(message, state)
+    try:
+        await db_delete_device(device.id)
+        logger.info(
+            f'<delete_device> OK {message.from_user.id} deleted {device.name}'
+        )
+        await message.answer(
+            f'Пристрій <b>{device.name}</b> був вдало видалений.'
+        )
+        await state.finish()
+        await command_my_device_list(message, state)
+    except ConnectionErrorDB:
+        await message.answer(
+            '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+            '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+            'Спробуйте повторити запит через деякий час.'
+        )
+        logger.warning(
+            f'<delete_device> BAD {message.from_user.id} get ConnectionErrorDB'
+        )
+        return await command_start(message, state)
 
 
 def register_device_management(dp: Dispatcher):
@@ -241,13 +320,6 @@ def register_device_management(dp: Dispatcher):
                                        inline.cd.filter(),
                                        state='*'
                                        )
-    dp.register_message_handler(answer_yes_or_no,
-                                Text(equals=['Так', 'Ні'],
-                                     ignore_case=True
-                                     ),
-                                state=['DeviceAction:change_device',
-                                       'DeviceAction:del_device']
-                                )
     dp.register_message_handler(select_field_to_change,
                                 Text(equals=['Назву',
                                              'IP',
@@ -258,3 +330,10 @@ def register_device_management(dp: Dispatcher):
                                 )
     dp.register_message_handler(update_device,
                                 state=DeviceChange.all_states)
+    dp.register_message_handler(answer_yes_or_no,
+                                Text(equals=['Так', 'Ні'],
+                                     ignore_case=True
+                                     ),
+                                state=['DeviceAction:change_device',
+                                       'DeviceAction:del_device']
+                                )

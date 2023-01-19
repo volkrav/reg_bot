@@ -1,12 +1,11 @@
 import logging
+
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-
 from aiogram.dispatcher.filters import Text
 
-from app.misc.classes import NeedHelp
 from app.keyboards import reply
-
+from app.misc.classes import NeedHelp
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +22,7 @@ async def command_help(message: types.Message, state: FSMContext):
         text=answer,
         reply_markup=reply.kb_help
     )
+
 
 async def command_how_to_register(message: types.Message, state: FSMContext):
     await NeedHelp.how_register.set()
@@ -47,11 +47,10 @@ async def command_how_it_work(message: types.Message, state: FSMContext):
     await message.answer(text=answer)
 
 
-
 def register_help(dp: Dispatcher):
     dp.register_message_handler(command_help,
-                            Text(equals='Допомога', ignore_case=True),
-                            state='*')
+                                Text(equals='Допомога', ignore_case=True),
+                                state='*')
     dp.register_message_handler(command_how_to_register,
                                 Text(equals='Як зареєструватися',
                                      ignore_case=True),

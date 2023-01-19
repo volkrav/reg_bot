@@ -4,10 +4,9 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from app.handlers.start import command_start
 from app.handlers.device_list import command_my_device_list
 from app.handlers.device_management import select_field_to_change
-
+from app.handlers.start import command_start
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +23,9 @@ async def _get_current_function(current_state: str):
     match (current_state, None):
         case state, _ if (not state) or\
                 state.split(':')[0] in ('Start',
-                                           'CheckIn',
-                                           'DeviceList',
-                                           'NeedHelp'):
+                                        'CheckIn',
+                                        'DeviceList',
+                                        'NeedHelp'):
             return command_start
         case 'DeviceAction:change_device', _:
             return command_my_device_list

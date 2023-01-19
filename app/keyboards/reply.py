@@ -1,9 +1,11 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
+
 
 '''************************ Окремі кнопки ************************'''
 
 btn_back = KeyboardButton(text='⬅️ Назад')
 btn_cancel = KeyboardButton(text='❌ Скасувати')
+
 
 '''************************ Стартове вікно ************************'''
 
@@ -38,6 +40,7 @@ kb_help = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+
 '''************************ Змінити пристрій ************************'''
 kb_change = ReplyKeyboardMarkup(
     keyboard=[
@@ -53,7 +56,7 @@ kb_change = ReplyKeyboardMarkup(
             btn_back,
         ],
     ],
-        resize_keyboard=True
+    resize_keyboard=True
 )
 
 
@@ -70,6 +73,8 @@ kb_yes_or_no = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+
 '''************************ Так Ні ************************'''
 
 kb_on_off_cancel = ReplyKeyboardMarkup(
@@ -87,6 +92,7 @@ kb_on_off_cancel = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+
 '''************************ Скасувати ************************'''
 
 kb_cancel = ReplyKeyboardMarkup(
@@ -95,6 +101,7 @@ kb_cancel = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
 
 '''************************ Назад ************************'''
 

@@ -1,12 +1,11 @@
 import logging
+
 from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
-
-from aiogram.dispatcher.filters import CommandStart, Text
+from aiogram.dispatcher.filters import CommandStart
 
 from app.keyboards import reply
 from app.misc.classes import Start
-
 
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,6 @@ async def command_start(message: types.Message, state: FSMContext):
         text=answer,
         reply_markup=reply.kb_start
     )
-
-
-
 
 
 def register_start(dp: Dispatcher):

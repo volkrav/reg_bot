@@ -1,6 +1,5 @@
-from aiogram.dispatcher.middlewares import BaseMiddleware
 from aiogram import types
-import aiogram.utils.markdown as fmt
+from aiogram.dispatcher.middlewares import BaseMiddleware
 
 
 class DelMessage(BaseMiddleware):

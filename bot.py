@@ -1,24 +1,20 @@
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher, executor, types
+from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.utils.exceptions import NetworkError
 
-from app.config import load_config, Config
-
-from app.middlewares.event_handling import DelMessage, CallbackAnswer
-
-from app.handlers.start import register_start
+from app.config import Config, load_config
+from app.data.db_api import db_create_tables
 from app.handlers.back import register_back
-from app.handlers.help import register_help
-from app.handlers.registration import register_reg
 from app.handlers.device_list import register_device_list
 from app.handlers.device_management import register_device_management
 from app.handlers.echo import register_echo
-
-from app.data.db_api import db_create_tables
-
+from app.handlers.help import register_help
+from app.handlers.registration import register_reg
+from app.handlers.start import register_start
+from app.middlewares.event_handling import CallbackAnswer, DelMessage
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO)
@@ -28,7 +24,6 @@ logger = logging.getLogger(__name__)
 # register middleware, filters and handlers,
 # the order of the call is fundamental
 def register_all_middlewares(dp: Dispatcher, config: Config):
-    # dp.setup_middleware(EnvironmentMiddleware(config=config))
     # dp.setup_middleware(DelMessage())
     dp.setup_middleware(CallbackAnswer())
 
@@ -57,7 +52,7 @@ async def main():
         # filename='reg_bot.log'
     )
 
-    config: Config = load_config()
+    config: Config = await load_config()
 
     # Initialize bot and dispatcher
     bot = Bot(token=config.tg_bot.token, parse_mode='HTML')
@@ -83,14 +78,13 @@ async def main():
         session = await bot.get_session()
         await session.close()
 
-if __name__ == '__main__':
 
+if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.error('Bot stopped!')
+        logger.error('reg_bot stopped!')
     except NetworkError:
-        logger.error('get NetworkError, try restart')
-        asyncio.run(main())
+        logger.error('reg_bot get NetworkError, try restart')
     except Exception as err:
-        logger.error(f'get {err.args}')
+        logger.error(f'reg_bot get {err.args}')
