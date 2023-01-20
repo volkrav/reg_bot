@@ -33,8 +33,8 @@ async def echo(message: types.Message, state: FSMContext):
         f'<b>Використайте, будь ласка, <u>клавіатуру</u> ' +
         f'або перезавантажте бота командою /start</b>'
     )
-    logger.info(
-        f'<echo> OK {message.from_user.id} unsupported command {message.text}'
+    logger.warning(
+        f'{message.from_user.id} unsupported command {message.text}'
     )
     await message.answer(
         text=answer,

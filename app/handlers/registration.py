@@ -25,8 +25,8 @@ async def command_start_registration(message: types.Message, state: FSMContext):
             '✉️ Сповіщення про помилку відправлене адміністратору.\n'
             'Спробуйте повторити запит через деякий час.'
         )
-        logger.warning(
-            f'<command_start_registration> BAD {message.from_user.id} get ConnectionErrorDB'
+        logger.error(
+            f'{message.from_user.id} get ConnectionErrorDB'
         )
         return await command_start(message, state)
 
@@ -35,8 +35,7 @@ async def command_start_registration(message: types.Message, state: FSMContext):
         reply_markup=reply.kb_cancel
     )
     logger.info(
-        f'<command_start_registration> OK {message.from_user.id} '
-        f'started registration'
+        f'{message.from_user.id} started registration'
     )
     await CheckIn.name.set()
     await message.answer(
@@ -47,8 +46,7 @@ async def command_start_registration(message: types.Message, state: FSMContext):
 
 async def command_cancel(message: types.Message, state: FSMContext):
     logger.info(
-        f'<command_cancel> OK {message.from_user.id} '
-        f'canceled registration'
+        f'{message.from_user.id} canceled registration'
     )
     await state.finish()
     await CheckIn.canceled.set()
@@ -61,7 +59,7 @@ async def enter_name(message: types.Message, state: FSMContext):
             data['user_id'] = message.from_user.id
             data['name'] = fmt.quote_html(message.text)
         logger.info(
-            f'<enter_name> OK {message.from_user.id} '
+            f'{message.from_user.id} '
             f'entered the name {message.text}'
         )
         await CheckIn.ip.set()
@@ -71,7 +69,7 @@ async def enter_name(message: types.Message, state: FSMContext):
         )
     else:
         logger.warning(
-            f'<enter_name> BAD {message.from_user.id} '
+            f'{message.from_user.id} '
             f'entered an unsupported name {message.text}'
         )
         await reply_not_validation_name(message)
@@ -82,7 +80,7 @@ async def enter_ip(message: types.Message, state: FSMContext):
         async with state.proxy() as data:
             data['ip'] = fmt.quote_html(message.text)
         logger.info(
-            f'<enter_ip> OK {message.from_user.id} '
+            f'{message.from_user.id} '
             f'entered the IP {message.text}'
         )
         await CheckIn.do_not_disturb.set()
@@ -92,7 +90,7 @@ async def enter_ip(message: types.Message, state: FSMContext):
         )
     else:
         logger.warning(
-            f'<enter_ip> BAD {message.from_user.id} '
+            f'{message.from_user.id} '
             f'entered an unsupported IP {message.text}'
         )
         await reply_not_validation_ip(message)

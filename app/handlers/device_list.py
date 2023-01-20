@@ -24,13 +24,13 @@ async def command_my_device_list(message: types.Message, state: FSMContext):
             '✉️ Сповіщення про помилку відправлене адміністратору.\n'
             'Спробуйте повторити запит через деякий час.'
         )
-        logger.warning(
-            f'<command_my_device_list> BAD {user_id} get ConnectionErrorDB'
+        logger.error(
+            f'{user_id} get ConnectionErrorDB'
         )
         return await command_start(message, state)
     except Exception as arr:
         logger.error(
-            f'<command_my_device_list> BAD {user_id} get {arr.args}'
+            f'{user_id} get {arr.args}'
         )
 
     if not device_list:
@@ -48,22 +48,22 @@ async def command_my_device_list(message: types.Message, state: FSMContext):
             answer = f'<b>{i+1}.</b> {await get_device_view(device)}'
             await message.answer(answer,
                                  reply_markup=await inline.create_device_keyboard(device_id=device.id))
-            logger.info(
-                f'<command_my_device_list> OK {user_id} view the list of devices'
-            )
+        logger.info(
+            f'{user_id} view the list of devices'
+        )
     except ConnectionErrorDB:
         await message.answer(
             '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
             '✉️ Сповіщення про помилку відправлене адміністратору.\n'
             'Спробуйте повторити запит через деякий час.'
         )
-        logger.warning(
-            f'<command_my_device_list> BAD {user_id} get ConnectionErrorDB'
+        logger.error(
+            f'{user_id} get ConnectionErrorDB'
         )
         return await command_start(message, state)
     except Exception as arr:
         logger.error(
-            f'<command_my_device_list> BAD {user_id} get {arr.args}'
+            f'{user_id} get {arr.args}'
         )
 
 

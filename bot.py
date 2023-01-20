@@ -48,7 +48,7 @@ async def main():
     logging.basicConfig(
         level=logging.INFO,
         datefmt='%d-%m-%y %H:%M:%S',
-        format=u'%(asctime)s - [%(levelname)s] - %(name)s.%(funcName)s:%(lineno)d - %(message)s',
+        format=u'%(asctime)s - [%(levelname)s] - (%(name)s).%(funcName)s:%(lineno)d - %(message)s',
         # filename='reg_bot.log'
     )
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
     try:
         asyncio.run(main())
     except (KeyboardInterrupt, SystemExit):
-        logger.error('reg_bot stopped!')
+        logger.warning('reg_bot stopped!')
     except NetworkError:
         logger.error('reg_bot get NetworkError, try restart')
     except Exception as err:

@@ -152,7 +152,7 @@ async def db_update_device(device_id: int, column_newvalues: dict):
                 device_id
             )
         logger.info(
-            f'update {device_id}'
+            f'update {device_id=}: {columns} on {new_values}'
         )
     except OSError:
         logger.error(

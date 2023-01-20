@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 async def command_help(message: types.Message, state: FSMContext):
     await NeedHelp.start.set()
     logger.info(
-        f'<command_help> OK {message.from_user.id} open help'
+        f'{message.from_user.id} open help'
     )
     answer = (
         f'Будь ласка, оберіть потрібний розділ ⤵️'
@@ -28,7 +28,7 @@ async def command_how_to_register(message: types.Message, state: FSMContext):
     await NeedHelp.how_register.set()
 
     logger.info(
-        f'<command_how_to_register> OK {message.from_user.id} looks how_to_register'
+        f'{message.from_user.id} looks how_to_register'
     )
     answer = (
         f'Детальна інструкція як зареєструватися'
@@ -39,7 +39,7 @@ async def command_how_to_register(message: types.Message, state: FSMContext):
 async def command_how_it_work(message: types.Message, state: FSMContext):
     await NeedHelp.how_work.set()
     logger.info(
-        f'<command_how_it_work> OK {message.from_user.id} looks how_it_work'
+        f'{message.from_user.id} looks how_it_work'
     )
     answer = (
         f'Детальний опис як працює чеккер'
