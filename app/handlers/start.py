@@ -15,7 +15,7 @@ async def command_start(message: types.Message, state: FSMContext):
     answer = ''
     if not current_state:
         logger.info(
-            f'<command_start> OK {message.from_user.id} started work')
+            f'{message.from_user.id} started work')
         answer = (
             f'- Привітальна інформація\n'
             f'- Короткий опис, як працює чекер.\n'

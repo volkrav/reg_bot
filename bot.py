@@ -47,8 +47,8 @@ async def main():
 
     logging.basicConfig(
         level=logging.INFO,
-        datefmt='%d-%m-%y %H:%M',
-        format=u'%(asctime)s #%(levelname)-8s %(name)s:%(lineno)d - %(message)s',
+        datefmt='%d-%m-%y %H:%M:%S',
+        format=u'%(asctime)s - [%(levelname)s] - %(name)s.%(funcName)s:%(lineno)d - %(message)s',
         # filename='reg_bot.log'
     )
 

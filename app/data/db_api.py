@@ -18,11 +18,11 @@ async def db_create_tables():
             await conn.execute(sql)
     except OSError:
         logger.error(
-            f'<db_create_tables> BAD cannot connect to database'
+            f'cannot connect to database'
         )
     except Exception as err:
         logger.error(
-            f'<db_create_tables> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -32,7 +32,7 @@ async def db_check_connect() -> bool | ConnectionErrorDB:
             return True
     except OSError:
         logger.error(
-            f'<db_create_tables> BAD cannot connect to database'
+            f'cannot connect to database'
         )
         raise ConnectionErrorDB()
 
@@ -57,12 +57,12 @@ async def db_add_device(device: Device):
                     })
     except ConnectionErrorDB:
         logger.error(
-            f'<db_add_device> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<db_add_device> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -78,12 +78,12 @@ async def get_all_users_devices(user_id: int) -> List[Device]:
         return devices_list
     except OSError:
         logger.error(
-            f'<get_all_users_devices> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<get_all_users_devices> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -104,12 +104,12 @@ async def db_get_device(device_id: int) -> Device:
             return None
     except ConnectionErrorDB:
         logger.error(
-            f'<db_get_device> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<db_get_device> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -122,16 +122,16 @@ async def db_delete_device(device_id: int) -> None:
                 int(device_id)
             )
         logger.info(
-            f'<db_delete_device> OK deleted {device_id}'
+            f'deleted {device_id}'
         )
     except OSError:
         logger.error(
-            f'<db_delete_device> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<db_delete_device> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -152,16 +152,16 @@ async def db_update_device(device_id: int, column_newvalues: dict):
                 device_id
             )
         logger.info(
-            f'<db_update_device> OK update {device_id}'
+            f'update {device_id}'
         )
     except OSError:
         logger.error(
-            f'<db_update_device> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<db_update_device> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -180,13 +180,13 @@ async def _insert(tablename: str, column_values: Dict):
                 *values
             )
             logger.info(
-                f'<_insert> OK inserting "{values[0]}" into a "{tablename}"'
+                f'inserting "{values[0]}" into a "{tablename}"'
             )
     except OSError:
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<_insert> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 
@@ -202,12 +202,12 @@ async def _check_is_user(user_id: int) -> bool:
         return res != None
     except OSError:
         logger.error(
-            f'<_check_is_user> BAD get cannot connect to database'
+            f'get cannot connect to database'
         )
         raise ConnectionErrorDB()
     except Exception as err:
         logger.error(
-            f'<_check_is_user> BAD get {err.args}'
+            f'get {err.args}'
         )
 
 

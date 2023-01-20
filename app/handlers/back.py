@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 async def command_back(message: types.Message, state: FSMContext):
     current_state = await state.get_state()
     logger.info(
-        f'<command_back> OK {message.from_user.id} is {current_state}')
+        f'{message.from_user.id} is {current_state}')
     current_function = await _get_current_function(current_state)
     await current_function(message, state)
 
