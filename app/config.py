@@ -9,6 +9,7 @@ load_dotenv(find_dotenv())
 @dataclass
 class TgBot:
     token: str
+    photo_id: str
 
 
 @dataclass
@@ -28,7 +29,8 @@ class Config:
 async def load_config() -> Config:
     return Config(
         tg_bot=TgBot(
-            token=os.environ.get('BOT_TOKEN')
+            token=os.environ.get('BOT_TOKEN'),
+            photo_id=os.environ.get('PHOTO_ID')
         )
     )
 

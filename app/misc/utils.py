@@ -1,4 +1,6 @@
+import asyncio
 import datetime
+import os
 
 import pytz
 from aiogram import types
@@ -6,6 +8,8 @@ from aiogram import types
 from app.keyboards import reply
 
 TZ = pytz.timezone("Europe/Kiev")
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 
 async def get_now_datetime() -> datetime.datetime:
@@ -63,3 +67,17 @@ async def reply_not_validation_name(message: types.Message):
         'Будь ласка, придумайте та введіть коротшу назву пристрою  ⤵️',
         reply_markup=reply.kb_cancel
     )
+
+
+async def get_text_from_file(filename: str) -> str | None:
+    loop = asyncio.get_running_loop()
+    try:
+        return await loop.run_in_executor(
+            None, _sync_open_file_for_read, STATIC_DIR, filename)
+    except Exception as err:
+        return None
+
+
+def _sync_open_file_for_read(STATIC_DIR: str, filename: str) -> str:
+    with open(os.path.join(STATIC_DIR, filename)) as data:
+        return data.read()
