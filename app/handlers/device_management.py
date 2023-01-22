@@ -92,7 +92,7 @@ async def select_field_to_change(message: types.Message, state: FSMContext):
             )
         case 'Не турбувати', _:
             curr_state_disturb = (
-                '🟢 ввімкнено' if device.do_not_disturb else '🔴 вимкнено'
+                '🟢 увімкнено' if device.do_not_disturb else '🔴 вимкнено'
             )
             await message.answer(
                 f'Поточний стан фунції "Не турбувати вночі": \n'
@@ -104,7 +104,7 @@ async def select_field_to_change(message: types.Message, state: FSMContext):
             )
         case 'Сповіщати', _:
             curr_state_notify = (
-                '🟢 ввімкнено' if device.notify else '🔴 вимкнено'
+                '🟢 увімкнено' if device.notify else '🔴 вимкнено'
             )
             await message.answer(
                 f'Поточний стан фунції "Сповіщати": \n'
@@ -183,9 +183,9 @@ async def update_device(message: types.Message, state: FSMContext):
                 await reply_not_validation_ip(message)
 
         case 'DeviceChange:do_not_disturb', new_state \
-                if new_state in ('🟢 ввімкнено', '🔴 вимкнено'):
+                if new_state in ('🟢 увімкнено', '🔴 вимкнено'):
             curr_state_do_not_disturb = (
-                '🟢 ввімкнено' if device.do_not_disturb else '🔴 вимкнено'
+                '🟢 увімкнено' if device.do_not_disturb else '🔴 вимкнено'
             )
             if curr_state_do_not_disturb != new_state:
                 try:
@@ -214,16 +214,16 @@ async def update_device(message: types.Message, state: FSMContext):
                     return await command_start(message, state)
 
         case 'DeviceChange:notify', new_state \
-                if new_state in ('🟢 ввімкнено', '🔴 вимкнено'):
+                if new_state in ('🟢 увімкнено', '🔴 вимкнено'):
             curr_state_notify = (
-                '🟢 ввімкнено' if device.notify else '🔴 вимкнено'
+                '🟢 увімкнено' if device.notify else '🔴 вимкнено'
             )
             if curr_state_notify != new_state:
                 try:
                     await db_update_device(device.id,
                                            {
                                                'notify': not device.notify,
-                                               'status': 'Не відстежується'
+                                               'status': '⚪ Не відстежується'
                                            }
                                            )
                     await message.answer(

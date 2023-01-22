@@ -80,7 +80,7 @@ kb_yes_or_no = ReplyKeyboardMarkup(
 kb_on_off_cancel = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='🟢 ввімкнено')
+            KeyboardButton(text='🟢 увімкнено')
         ],
         [
             KeyboardButton(text='🔴 вимкнено')
