@@ -85,7 +85,9 @@ async def enter_ip(message: types.Message, state: FSMContext):
         )
         await CheckIn.do_not_disturb.set()
         await message.answer(
-            text='Ввімкнути функцію "Не турбувати вночі"?',
+            text='Ввімкнути функцію "Не турбувати вночі"?\n' +
+            'Якщо увімкнути цю функцію, то з 23:00 до 7:00 бот ' +
+            'не буде надсилати сповіщення про зміну статусу цього пристрою.',
             reply_markup=reply.kb_yes_or_no
         )
     else:
