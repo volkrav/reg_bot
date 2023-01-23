@@ -26,7 +26,7 @@ async def command_start_registration(message: types.Message, state: FSMContext):
                 "оскільки зараз діє тимчасове обмеження – не більше п'яти " +
                 "зареєстрованих пристроїв для одного користувача."
             )
-            return
+            return await command_start(message, state)
     except ConnectionErrorDB:
         await message.answer(
             '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
