@@ -211,6 +211,27 @@ async def _check_is_user(user_id: int) -> bool:
         )
 
 
+async def count_number_of_devices(user_id: int) -> int:
+    try:
+        print('count_number_of_devices')
+        async with UseDataBase() as conn:
+            return await conn.fetchval(
+                'SELECT count(*) ' +
+                'FROM devices ' +
+                'WHERE user_id=$1',
+                user_id
+            )
+    except OSError:
+        logger.error(
+            f'get cannot connect to database'
+        )
+        raise ConnectionErrorDB()
+    except Exception as err:
+        logger.error(
+            f'get {err.args}'
+        )
+
+
 # async def db_check_is_device(device_id: int) -> bool:
 #     async with UseDataBase() as conn:
 #         res = await conn.fetchrow(

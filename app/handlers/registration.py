@@ -5,7 +5,7 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from app.data.db_api import db_add_device, db_check_connect
+from app.data.db_api import db_add_device, db_check_connect, count_number_of_devices
 from app.handlers.back import command_back, command_start
 from app.keyboards import reply
 from app.misc.classes import CheckIn, Start, create_device, ConnectionErrorDB
@@ -16,9 +16,17 @@ logger = logging.getLogger(__name__)
 
 
 async def command_start_registration(message: types.Message, state: FSMContext):
+    number_of_devices = 5
     await CheckIn.start.set()
     try:
         await db_check_connect()
+        if await count_number_of_devices(message.from_user.id) >= number_of_devices:
+            await message.answer(
+                "❌ Ви більше не можете реєструвати нові пристрої, " +
+                "оскільки зараз діє тимчасове обмеження – не більше п'яти " +
+                "зареєстрованих пристроїв для одного користувача."
+            )
+            return
     except ConnectionErrorDB:
         await message.answer(
             '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
@@ -29,7 +37,6 @@ async def command_start_registration(message: types.Message, state: FSMContext):
             f'{message.from_user.id} get ConnectionErrorDB'
         )
         return await command_start(message, state)
-
     await message.answer(
         text='✅ В цьому розділі можна зареєструвати новий пристрій',
         reply_markup=reply.kb_cancel
