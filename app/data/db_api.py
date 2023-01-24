@@ -36,25 +36,26 @@ async def db_check_connect() -> bool | ConnectionErrorDB:
         )
         raise ConnectionErrorDB()
 
+
 async def db_add_device(device: Device):
     try:
         if not await _check_is_user(device.user_id):
             await _insert('users',
-                        {
-                            'user_id': device.user_id,
-                            'reg_date': await get_now_datetime()
-                        })
+                          {
+                              'user_id': device.user_id,
+                              'reg_date': await get_now_datetime()
+                          })
         await _insert('devices',
-                    {
-                        'name': device.name,
-                        'ip': device.ip,
-                        'status': device.status,
-                        'do_not_disturb': device.do_not_disturb,
-                        'notify': device.notify,
-                        'change_date': device.change_date,
-                        'user_id': device.user_id,
-                        'last_check': await get_now_datetime_minus_an_hour()
-                    })
+                      {
+                          'name': device.name,
+                          'ip': device.ip,
+                          'status': device.status,
+                          'do_not_disturb': device.do_not_disturb,
+                          'notify': device.notify,
+                          'change_date': device.change_date,
+                          'user_id': device.user_id,
+                          'last_check': await get_now_datetime_minus_an_hour()
+                      })
     except ConnectionErrorDB:
         logger.error(
             f'get cannot connect to database'
@@ -70,8 +71,19 @@ async def get_all_users_devices(user_id: int) -> List[Device]:
     try:
         async with UseDataBase() as conn:
             device_rows = await conn.fetch(
-                f'SELECT * FROM devices '
-                f'WHERE user_id=$1',
+                'SELECT ' +
+                'id, ' +
+                'name, ' +
+                'ip, ' +
+                'status, ' +
+                'do_not_disturb, ' +
+                'notify, ' +
+                "change_date AT TIME ZONE 'Europe/Kiev' as change_date, " +
+                'user_id, ' +
+                'last_check ' +
+                'FROM devices '
+                'WHERE user_id=$1' +
+                'ORDER BY id',
                 user_id
             )
         devices_list = [await create_device(device) for device in device_rows]
@@ -92,8 +104,18 @@ async def db_get_device(device_id: int) -> Device:
         try:
             async with UseDataBase() as conn:
                 device_row = await conn.fetchrow(
-                    f'SELECT * FROM devices '
-                    f'WHERE id=$1',
+                    'SELECT ' +
+                    'id, ' +
+                    'name, ' +
+                    'ip, ' +
+                    'status, ' +
+                    'do_not_disturb, ' +
+                    'notify, ' +
+                    "change_date AT TIME ZONE 'Europe/Kiev' as change_date, " +
+                    'user_id, ' +
+                    'last_check ' +
+                    'FROM devices '
+                    'WHERE id=$1',
                     int(device_id)
                 )
             device = await create_device(device_row)
