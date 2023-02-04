@@ -13,14 +13,14 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 
 
 async def get_now_datetime() -> datetime.datetime:
-    now = datetime.datetime.now(TZ)
+    now = datetime.datetime.now(TZ).replace(tzinfo=None)
     return now
 
 
 async def get_now_formatted(dt: datetime.datetime = None) -> str:
     if not dt:
         dt = await get_now_datetime()
-    return dt.strftime("%H:%M:%S %d-%m-%Y")
+    return dt.strftime("%H:%M %d.%m.%Y")
 
 
 async def get_now_datetime_minus_an_hour():

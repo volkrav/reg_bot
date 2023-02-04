@@ -71,17 +71,8 @@ async def get_all_users_devices(user_id: int) -> List[Device]:
     try:
         async with UseDataBase() as conn:
             device_rows = await conn.fetch(
-                'SELECT ' +
-                'id, ' +
-                'name, ' +
-                'ip, ' +
-                'status, ' +
-                'do_not_disturb, ' +
-                'notify, ' +
-                "change_date AT TIME ZONE 'Europe/Kiev' as change_date, " +
-                'user_id, ' +
-                'last_check ' +
-                'FROM devices '
+                'SELECT *' +
+                'FROM devices ' +
                 'WHERE user_id=$1' +
                 'ORDER BY id',
                 user_id
@@ -104,17 +95,8 @@ async def db_get_device(device_id: int) -> Device:
         try:
             async with UseDataBase() as conn:
                 device_row = await conn.fetchrow(
-                    'SELECT ' +
-                    'id, ' +
-                    'name, ' +
-                    'ip, ' +
-                    'status, ' +
-                    'do_not_disturb, ' +
-                    'notify, ' +
-                    "change_date AT TIME ZONE 'Europe/Kiev' as change_date, " +
-                    'user_id, ' +
-                    'last_check ' +
-                    'FROM devices '
+                    'SELECT * ' +
+                    'FROM devices ' +
                     'WHERE id=$1',
                     int(device_id)
                 )
