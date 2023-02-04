@@ -19,7 +19,8 @@ kb_start = ReplyKeyboardMarkup(
             KeyboardButton(text='Допомога')
         ]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -37,7 +38,8 @@ kb_help = ReplyKeyboardMarkup(
             btn_back
         ]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -56,7 +58,8 @@ kb_change = ReplyKeyboardMarkup(
             btn_back,
         ],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -71,7 +74,8 @@ kb_yes_or_no = ReplyKeyboardMarkup(
             KeyboardButton(text='Ні')
         ],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -89,7 +93,8 @@ kb_on_off_cancel = ReplyKeyboardMarkup(
             btn_cancel
         ],
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -99,7 +104,8 @@ kb_cancel = ReplyKeyboardMarkup(
     keyboard=[
         [btn_cancel]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
 
 
@@ -109,5 +115,6 @@ kb_back = ReplyKeyboardMarkup(
     keyboard=[
         [btn_back]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    is_persistent=True
 )
