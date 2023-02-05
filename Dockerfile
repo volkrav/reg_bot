@@ -8,8 +8,6 @@ COPY . .
 
 RUN pip install pipenv
 
-RUN pipenv install --deploy --ignore-pipfile
+RUN pipenv install --deploy
 
-CMD [ "pipenv", "run", "python", "bot.py" ]
-
-
+CMD [ "pipenv", "run", "python", "regbot.py" ]

@@ -71,10 +71,12 @@ async def get_all_users_devices(user_id: int) -> List[Device]:
     try:
         async with UseDataBase() as conn:
             device_rows = await conn.fetch(
-                'SELECT *' +
-                'FROM devices ' +
-                'WHERE user_id=$1' +
-                'ORDER BY id',
+                '''
+                SELECT *
+                FROM devices
+                WHERE user_id=$1
+                ORDER BY id
+                ''',
                 user_id
             )
         devices_list = [await create_device(device) for device in device_rows]
@@ -95,9 +97,11 @@ async def db_get_device(device_id: int) -> Device:
         try:
             async with UseDataBase() as conn:
                 device_row = await conn.fetchrow(
-                    'SELECT * ' +
-                    'FROM devices ' +
-                    'WHERE id=$1',
+                    '''
+                    SELECT *
+                    FROM devices
+                    WHERE id=$1
+                    ''',
                     int(device_id)
                 )
             device = await create_device(device_row)
@@ -121,8 +125,10 @@ async def db_delete_device(device_id: int) -> None:
     try:
         async with UseDataBase() as conn:
             await conn.execute(
-                f'DELETE FROM devices '
-                f'WHERE id=$1',
+                '''
+                DELETE FROM devices
+                WHERE id=$1
+                ''',
                 int(device_id)
             )
         logger.info(
@@ -198,8 +204,10 @@ async def _check_is_user(user_id: int) -> bool:
     try:
         async with UseDataBase() as conn:
             res = await conn.fetchrow(
-                f'SELECT * FROM users '
-                f'WHERE user_id=$1',
+                '''
+                SELECT * FROM users
+                WHERE user_id=$1
+                ''',
                 user_id,
                 record_class=None
             )
