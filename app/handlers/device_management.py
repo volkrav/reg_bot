@@ -90,7 +90,7 @@ async def select_field_to_change(message: types.Message, state: FSMContext):
             )
             await DeviceChange.ip.set()
             await message.answer(
-                text="Введіть нове значення IP пристрою ⤵️",
+                text="Введіть нове значення IP-адреси пристрою ⤵️",
                 reply_markup=reply.kb_cancel
             )
         case 'Не турбувати', _:
@@ -163,6 +163,7 @@ async def update_device(message: types.Message, state: FSMContext):
         case 'DeviceChange:ip', new_ip:
             try:
                 if await check_ip(new_ip):
+                    new_ip = new_ip.strip(" .")
                     try:
                         await db_update_device(device.id,
                                                {
@@ -170,7 +171,7 @@ async def update_device(message: types.Message, state: FSMContext):
                                                }
                                                )
                         await message.answer(
-                            f'Вдало змінено IP з <b>{device.ip}</b> '
+                            f'Вдало змінено IP-адресу з <b>{device.ip}</b> '
                             f'на <b>{new_ip}</b>'
                         )
                         logger.info(

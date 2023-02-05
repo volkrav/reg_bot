@@ -30,7 +30,7 @@ async def echo(message: types.Message, state: FSMContext):
 
     answer = (
         f'Ви ввели команду, яку я не розумію.\n\n' +
-        f'<b>Використайте, будь ласка, <u>клавіатуру</u> ' +
+        f'<b>Використайте, будь ласка, <u>клавіатуру</u> ⌨️ ' +
         f'або перезавантажте бота командою /start</b>'
     )
     logger.warning(

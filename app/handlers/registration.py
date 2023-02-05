@@ -5,13 +5,16 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from app.data.db_api import db_add_device, db_check_connect, count_number_of_devices
+from app.data.db_api import (count_number_of_devices, db_add_device,
+                             db_check_connect)
 from app.handlers.back import command_back, command_start
 from app.keyboards import reply
 from app.misc.classes import CheckIn, Start, create_device
+from app.misc.exceptions import (ConnectionErrorDB, InvalidIPaddress,
+                                 IsLocalIPaddress)
 from app.misc.utils import (check_ip, check_name, reply_not_validation_ip,
-                            reply_not_validation_name, reply_unsupported_local_ip)
-from app.misc.exceptions import ConnectionErrorDB, InvalidIPaddress, IsLocalIPaddress
+                            reply_not_validation_name,
+                            reply_unsupported_local_ip)
 
 logger = logging.getLogger(__name__)
 
@@ -86,15 +89,16 @@ async def enter_name(message: types.Message, state: FSMContext):
 async def enter_ip(message: types.Message, state: FSMContext):
     try:
         if await check_ip(fmt.quote_html(message.text)):
+            ip = fmt.quote_html(message.text).strip(' .')
             async with state.proxy() as data:
-                data['ip'] = fmt.quote_html(message.text)
+                data['ip'] = ip
             logger.info(
                 f'{message.from_user.id} '
-                f'entered the IP {message.text}'
+                f'entered the IP {ip}'
             )
             await CheckIn.do_not_disturb.set()
             await message.answer(
-                text='Ввімкнути функцію "Не турбувати вночі"?\n' +
+                text='Увімкнути функцію "Не турбувати вночі"?\n' +
                 'Якщо увімкнути цю функцію, то з 23:00 до 7:00 бот ' +
                 'не буде надсилати сповіщення про зміну статусу цього пристрою.',
                 reply_markup=reply.kb_yes_or_no
@@ -108,10 +112,9 @@ async def enter_ip(message: types.Message, state: FSMContext):
     except IsLocalIPaddress:
         logger.warning(
             f'{message.from_user.id} '
-            f'entered an local IP {message.text}'
+            f'entered a local IP {message.text}'
         )
         await reply_unsupported_local_ip(message)
-
 
 
 async def is_disturb(message: types.Message, state: FSMContext):

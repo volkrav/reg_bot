@@ -4,10 +4,10 @@ from aiogram import Dispatcher, types
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
-from app.keyboards import reply
 from app.config import Config
-from app.misc.utils import get_text_from_file
+from app.keyboards import reply
 from app.misc.classes import NeedHelp
+from app.misc.utils import get_text_from_file
 
 logger = logging.getLogger(__name__)
 

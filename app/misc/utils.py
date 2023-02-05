@@ -6,6 +6,7 @@ import pytz
 from aiogram import types
 
 from app.keyboards import reply
+
 from .exceptions import InvalidIPaddress, IsLocalIPaddress
 
 TZ = pytz.timezone("Europe/Kiev")
@@ -36,43 +37,45 @@ async def get_user_id(message: types.Message):
 async def check_ip(ip: str) -> bool | InvalidIPaddress:
     if not isinstance(ip, str):
         raise InvalidIPaddress()
-    octets = ip.split('.')
+    octets = ip.strip(' .').split('.')
     if len(octets) != 4:
         raise InvalidIPaddress()
     for octet in octets:
         if (not octet.isdigit()) or \
                 (int(octet) < 0 or int(octet) > 255):
             raise InvalidIPaddress()
-    locale_ip = {10, 127, 172, 198}
-    if int(octets[0]) in locale_ip:
+    if int(octets[0]) in {10, 127} or \
+        (int(octets[0]) == 192 and int(octets[1]) == 168) or \
+            (int(octets[0]) == 172 and 15 < int(octets[1]) < 32):
         raise IsLocalIPaddress()
     return True
 
 
 async def reply_not_validation_ip(message: types.Message):
     await message.reply(
-        text='<b>‼️ Невірний формат IP адреси ‼️</b>\n\n' +
+        text='<b>‼️ Невірний формат IP-адреси ‼️</b>\n\n' +
         'IP-адреси є набір з чотирьох чисел, розділених крапками, ' +
         'наприклад, 203.0.113.41. Кожне число цього набору належить ' +
         'інтервалу від 0 до 255. Таким чином, повний діапазон ' +
         'IP-адресації – це адреси від 0.0.0.0 до 255.255.255.255\n\n'
-        'Введіть, будь ласка, коректне значення IP-адреси пристрою  ⤵️',
+        'Введіть, будь ласка, коректне значення IP-адреси пристрою  ⌨️⤵️',
         reply_markup=reply.kb_cancel
     )
 
+
 async def reply_unsupported_local_ip(message: types.Message):
     await message.reply(
-        text='<b>‼️ Локальна IP адреса ‼️</b>\n\n' +
-        'IP-адреси, які починаються з:\n' +
-        '<b>• 192.168.0.0</b>\n' +
-        '<b>• 172.16.0.0</b>\n' +
-        '<b>• 127.0.0.0</b>\n' +
-        '<b>• 10.0.0.0</b>\n' +
+        text='<b>‼️ Локальна IP-адреса ‼️</b>\n\n' +
+        'IP-адреси:\n' +
+        '<b>• від 192.168.0.0 до 192.168.255.255</b>\n' +
+        '<b>• від 172.16.0.0 до 172.31.255.255</b>\n' +
+        '<b>• від 127.0.0.0 до 127.255.255.255</b>\n' +
+        '<b>• від 10.0.0.0 до 10.255.255.255</b>\n' +
         'є локальними адресами і призначені для внутрішнього використання в приватних мережах. ' +
         'Такі адреси не можуть бути використані для перевірки доступності з Інтернету.\n' +
         '⚠️ Для коректної роботи бота потрібна <b>зовнішня статична IP-адреса</b> та дозвіл ' +
         'на пристрої відповідати на ping-запити.\n\n' +
-        'Введіть, будь ласка, коректне значення IP-адреси пристрою  ⤵️',
+        'Введіть, будь ласка, коректне значення IP-адреси пристрою  ⌨️⤵️',
         reply_markup=reply.kb_cancel
     )
 
