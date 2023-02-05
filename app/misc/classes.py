@@ -54,9 +54,6 @@ class Device(NamedTuple):
     last_check: datetime.datetime | str
 
 
-class ConnectionErrorDB(Exception):
-    ...
-
 async def create_device(data: dict) -> Device:
     return Device(
         id=data.get('id', None),

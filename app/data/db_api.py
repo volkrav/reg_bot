@@ -4,7 +4,7 @@ from typing import Dict, List
 from app.data.DBcm import UseDataBase
 from app.misc.classes import Device, create_device
 from app.misc.utils import get_now_datetime, get_now_datetime_minus_an_hour
-from app.misc.classes import ConnectionErrorDB
+from app.misc.exceptions import ConnectionErrorDB
 
 
 logger = logging.getLogger(__name__)

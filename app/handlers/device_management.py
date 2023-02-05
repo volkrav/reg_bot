@@ -6,14 +6,17 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Text
 
 from app.data.db_api import db_delete_device, db_get_device, db_update_device
-from app.handlers.start import command_start
 from app.handlers.device_list import command_my_device_list
 from app.handlers.echo import echo
+from app.handlers.start import command_start
 from app.keyboards import inline, reply
 from app.misc.classes import (Device, DeviceAction, DeviceChange,
-                              ConnectionErrorDB, get_device_view)
+                              get_device_view)
+from app.misc.exceptions import (ConnectionErrorDB, InvalidIPaddress,
+                                 IsLocalIPaddress)
 from app.misc.utils import (check_ip, check_name, get_user_id,
-                            reply_not_validation_ip, reply_not_validation_name)
+                            reply_not_validation_ip, reply_not_validation_name,
+                            reply_unsupported_local_ip)
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +47,7 @@ async def action_choice(call: types.CallbackQuery, state: FSMContext, callback_d
 async def preparing_to_change_device(message: types.Message, state: FSMContext):
     user_id = await get_user_id(message)
     async with state.proxy() as data:
-        device: Device | None = data.get('device')
+        device: Device = data.get('device')
     if device is None:
         logger.warning(
             f'{user_id} tried to change a deleted device'
@@ -158,33 +161,45 @@ async def update_device(message: types.Message, state: FSMContext):
                 await reply_not_validation_name(message)
 
         case 'DeviceChange:ip', new_ip:
-            if await check_ip(new_ip):
-                try:
-                    await db_update_device(device.id,
-                                           {
-                                               'ip': new_ip
-                                           }
-                                           )
-                    await message.answer(
-                        f'Вдало змінено IP з <b>{device.ip}</b> '
-                        f'на <b>{new_ip}</b>'
-                    )
-                    logger.info(
-                        f'{message.from_user.id} to changed ip {device.ip} on {new_ip}'
-                    )
-                except ConnectionErrorDB:
-                    await message.answer(
-                        '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
-                        '✉️ Сповіщення про помилку відправлене адміністратору.\n'
-                        'Спробуйте повторити запит через деякий час.'
-                    )
-                    logger.error(
-                        f'{message.from_user.id} get ConnectionErrorDB'
-                    )
-                    return await command_start(message, state)
-            else:
+            try:
+                if await check_ip(new_ip):
+                    try:
+                        await db_update_device(device.id,
+                                               {
+                                                   'ip': new_ip
+                                               }
+                                               )
+                        await message.answer(
+                            f'Вдало змінено IP з <b>{device.ip}</b> '
+                            f'на <b>{new_ip}</b>'
+                        )
+                        logger.info(
+                            f'{message.from_user.id} to changed ip {device.ip} on {new_ip}'
+                        )
+                    except ConnectionErrorDB:
+                        await message.answer(
+                            '❌ Вибачте, зараз я не можу обробити цей запит.\n' +
+                            '✉️ Сповіщення про помилку відправлене адміністратору.\n'
+                            'Спробуйте повторити запит через деякий час.'
+                        )
+                        logger.error(
+                            f'{message.from_user.id} get ConnectionErrorDB'
+                        )
+                        return await command_start(message, state)
+            except InvalidIPaddress:
                 is_check = False
+                logger.warning(
+                    f'{message.from_user.id} '
+                    f'entered an unsupported IP {message.text}'
+                )
                 await reply_not_validation_ip(message)
+            except IsLocalIPaddress:
+                is_check = False
+                logger.warning(
+                    f'{message.from_user.id} '
+                    f'entered an local IP {message.text}'
+                )
+                await reply_unsupported_local_ip(message)
 
         case 'DeviceChange:do_not_disturb', new_state \
                 if new_state in ('🟢 увімкнено', '🔴 вимкнено'):

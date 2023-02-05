@@ -7,7 +7,8 @@ from aiogram.dispatcher.filters import Text
 from app.data.db_api import get_all_users_devices
 from app.handlers.start import command_start
 from app.keyboards import inline, reply
-from app.misc.classes import DeviceList, get_device_view, ConnectionErrorDB
+from app.misc.exceptions import ConnectionErrorDB
+from app.misc.classes import DeviceList, get_device_view
 
 logger = logging.getLogger(__name__)
 
