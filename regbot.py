@@ -49,7 +49,7 @@ async def main():
         level=logging.INFO,
         datefmt='%d-%m-%y %H:%M:%S',
         format=u'%(asctime)s - [%(levelname)s] - (%(name)s).%(funcName)s:%(lineno)d - %(message)s',
-        # filename='regbot.log'
+        filename='regbot.log'
     )
 
     config: Config = await load_config()
